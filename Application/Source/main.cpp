@@ -2,8 +2,7 @@
 
 #include "Application.h"
 
-int main( void )
-{
+int main( void ) {
 	Application app;
 	app.Init();
 	app.Run();

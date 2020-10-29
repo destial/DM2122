@@ -4,8 +4,7 @@
 
 #include "timer.h"
 
-class Application
-{
+class Application {
 public:
 	Application();
 	~Application();
