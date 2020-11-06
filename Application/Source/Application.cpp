@@ -1,4 +1,3 @@
-
 #include "Application.h"
 
 //Include GLEW
@@ -12,6 +11,7 @@
 #include <stdlib.h>
 
 #include "Scene1.h"
+#include "Scene2.h"
 
 GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
@@ -29,6 +29,10 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
+}
+
+void resize_callback(GLFWwindow* window, int w, int h) {
+	glViewport(0, 0, w, h);
 }
 
 bool Application::IsKeyPressed(unsigned short key)
@@ -65,6 +69,7 @@ void Application::Init()
 
 	//Create a window and create its OpenGL context
 	m_window = glfwCreateWindow(1280, 720, "Week 1", NULL, NULL);
+	glfwSetWindowSizeCallback(m_window, resize_callback);
 
 	//If the window couldn't be created
 	if (!m_window)
@@ -95,7 +100,7 @@ void Application::Init()
 void Application::Run()
 {
 	//Main Loop
-	Scene *scene = new Scene1();
+	Scene *scene = new Scene2();
 	scene->Init();
 
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
