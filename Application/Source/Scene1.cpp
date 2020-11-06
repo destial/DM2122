@@ -106,27 +106,16 @@ void Scene1::Render() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer[GEO_TRIANGLE_1]);
 	glVertexAttribPointer(
-		0,		  // attribute 0. Must match the layout in the shader, 0 is usually for vertex
-		3,		  // Size
-		GL_FLOAT, // Type
-		GL_FALSE, // Normalized?
-		0,		  // Stride
-		0		  // Array buffer offset
-	);
+		0,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		0);
 	glBindBuffer(GL_ARRAY_BUFFER, m_colorBuffer[GEO_TRIANGLE_1]);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-	// Draw triangle
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 9); // Starting from vertex 0; 3 vertices = 1 triangle
-
-	/*glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer[GEO_TRIANGLE_2]);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_colorBuffer[GEO_TRIANGLE_2]);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glDrawArrays(GL_TRIANGLES, 0, 5);*/
-
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 9);
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
