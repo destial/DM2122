@@ -12,8 +12,8 @@ void Scene2::Init() {
 		"Shader//TransformVertexShader.vertexshader",
 		"Shader//SimpleFragmentShader.fragmentshader"
 	);
-	m_parameters[U_MVP] = glGetUniformLocation(m_programID, "MVP");
 	glUseProgram(m_programID);
+	m_parameters[U_MVP] = glGetUniformLocation(m_programID, "MVP");
 
 	glGenVertexArrays(1, &m_vertexArrayID);
 	glBindVertexArray(m_vertexArrayID);
@@ -78,7 +78,7 @@ void Scene2::Init() {
 		0.6f, 0.0f, 0.1f,
 		0.6f, 0.0f, 0.1f
 	};
-
+	
 	rotateAngle = 0;
 	translateX = 0;
 	translateY = 0;
@@ -86,6 +86,7 @@ void Scene2::Init() {
 	reverse = false;
 	up = false;
 	scaling = false;
+	SetToIdentity();
 	projection.SetToOrtho(-40, +40, -30, +30, -10, +10);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer[GEO_TRIANGLE_1]);
