@@ -385,7 +385,6 @@ Scalar product of scalar with vector
 	Resulting vector
 */
 /******************************************************************************/
-Vector3 operator*( float scalar, const Vector3& rhs )
-{
+Vector3 operator*( float scalar, const Vector3& rhs ) {
 	return rhs * scalar;
 }

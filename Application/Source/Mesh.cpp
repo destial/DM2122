@@ -2,9 +2,7 @@
 #include "Vertex.h"
 #include "GL\glew.h"
 
-Mesh::Mesh(const std::string &meshName)
-	: name(meshName)
-	, mode(DRAW_TRIANGLES) {
+Mesh::Mesh(const std::string &meshName): name(meshName), mode(DRAW_TRIANGLES) {
 	glGenBuffers(1, &vertexBuffer);
 	glGenBuffers(1, &indexBuffer);
 }
@@ -33,6 +31,9 @@ void Mesh::Render() {
 		break;
 	case (DRAW_LINES):
 		glDrawElements(GL_LINES, indexSize, GL_UNSIGNED_INT, 0);;
+		break;
+	case (DRAW_TRIANGLE_FAN):
+		glDrawElements(GL_TRIANGLE_FAN, indexSize, GL_UNSIGNED_INT, 0);
 		break;
 	default:
 		glDrawElements(GL_TRIANGLES, indexSize, GL_UNSIGNED_INT, 0);

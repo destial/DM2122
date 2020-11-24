@@ -1,20 +1,24 @@
-#ifndef SCENE_4_H
-#define SCENE_4_H
+#ifndef SCENE_5_H
+#define SCENE_5_H
 
 #include "Scene.h"
 #include "Mtx44.h"
 #include "Camera.h"
 #include "Mesh.h"
 #include "MeshBuilder.h"
+#include "MatrixStack.h"
 #include "GL\glew.h"
 #include "shader.hpp"
 #include <cmath>
 
-class Scene4 : public Scene {
+class Scene5 : public Scene {
 	enum GEOMETRY_TYPE {
 		GEO_AXES = 0,
-		GEO_QUAD,
-		GEO_CUBE,
+		GEO_SUN,
+		GEO_MERCURY,
+		GEO_MOON,
+		GEO_EARTH,
+		GEO_RING,
 		NUM_GEOMETRY,
 	};
 	enum UNIFORM_TYPE {
@@ -30,6 +34,7 @@ private:
 	unsigned m_programID;
 	unsigned m_parameters[U_TOTAL];
 	float rotateAngle;
+	float rotateAngle2;
 	float translateX;
 	float translateY;
 	float scaleAll;
@@ -38,13 +43,11 @@ private:
 	bool side;
 	bool scaling;
 	float r, g, b;
-	Mtx44 translate, rotate, scale;
-	Mtx44 model, view, projection;
-	Mtx44 MVP;
+	MS modelStack, viewStack, projectionStack;
 	Camera camera;
 public:
-	Scene4();
-	~Scene4();
+	Scene5();
+	~Scene5();
 
 	virtual void Init();
 	virtual void Update(double dt);

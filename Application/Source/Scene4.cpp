@@ -21,11 +21,12 @@ void Scene4::Init() {
 	glBindVertexArray(m_vertexArrayID);
 
 	meshList[GEO_CUBE] = MeshBuilder::GenerateCube("cube", 1, 1, 1);
+	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("axes");
 
 	rotateAngle = 0;
 	translateX = 0;
 	translateY = 0;
-	scaleAll = 0;
+	scaleAll = 1;
 	reverse = false;
 	up = false;
 	scaling = false;
@@ -52,6 +53,12 @@ void Scene4::Update(double dt) {
 	if (Application::IsKeyPressed('4')) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
+	if (Application::IsKeyPressed('W')) {
+		scaleAll+=0.1;
+	}
+	if (Application::IsKeyPressed('S')) {
+		scaleAll -= 0.1;
+	}
 
 	rotateAngle -= 0.5;
 	camera.Update(dt);
@@ -66,12 +73,14 @@ void Scene4::Render() {
 		camera.target.x, camera.target.y, camera.target.z,
 		camera.up.x, camera.up.y, camera.up.z
 	);
+	scale.SetToScale(scaleAll, scaleAll, scaleAll);
 	rotate.SetToRotation(rotateAngle, 0, 0, 1);
 	model = translate * rotate * scale;
 	MVP = projection * view * model;
 	glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
 
 	meshList[GEO_CUBE]->Render();
+	meshList[GEO_AXES]->Render();
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);

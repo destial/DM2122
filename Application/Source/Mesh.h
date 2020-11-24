@@ -10,6 +10,7 @@ public:
 		DRAW_TRIANGLES, //default mode
 		DRAW_TRIANGLE_STRIP,
 		DRAW_LINES,
+		DRAW_TRIANGLE_FAN,
 		DRAW_MODE_LAST,
 	};
 	Mesh(const std::string &meshName);
