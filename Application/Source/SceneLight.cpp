@@ -29,7 +29,7 @@ void SceneLight::Init() {
 	m_parameters[U_LIGHTENABLED] = glGetUniformLocation(m_programID, "lightEnabled");
 	glUseProgram(m_programID);
 
-	light[0].pos.Set(0, 25, 0);
+	light[0].position.Set(0, 5, 0);
 	light[0].color.Set(1, 1, 1);
 	light[0].power = 1;
 	light[0].kC = 1.f;
@@ -52,7 +52,7 @@ void SceneLight::Init() {
 	meshList[GEO_SUN]->material.kDiffuse.Set(0.f, 0.f, 0.f);
 	meshList[GEO_SUN]->material.kSpecular.Set(0.f, 0.f, 0.f);
 	meshList[GEO_SUN]->material.kShininess = 1.f;
-	meshList[GEO_LIGHT] = MeshBuilder::GenerateSphere("light", light[0].color, 2);
+	meshList[GEO_LIGHT] = MeshBuilder::GenerateSphere("light", Color(1.f, 1.f, 1.f), 2);
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("floor", Color(1.f, 1.f, 1.f), 50);
 
 	Mtx44 projection; 
@@ -79,17 +79,17 @@ void SceneLight::Update(double dt) {
 	}
 	unsigned LSPEED = 10.f;
 	if (Application::IsKeyPressed('I'))
-		light[0].pos.z -= (float)(LSPEED * dt);
+		light[0].position.z -= (float)(LSPEED * dt);
 	if (Application::IsKeyPressed('K'))
-		light[0].pos.z += (float)(LSPEED * dt);
+		light[0].position.z += (float)(LSPEED * dt);
 	if (Application::IsKeyPressed('J'))
-		light[0].pos.x -= (float)(LSPEED * dt);
+		light[0].position.x -= (float)(LSPEED * dt);
 	if (Application::IsKeyPressed('L'))
-		light[0].pos.x += (float)(LSPEED * dt);
+		light[0].position.x += (float)(LSPEED * dt);
 	if (Application::IsKeyPressed('O'))
-		light[0].pos.y -= (float)(LSPEED * dt);
+		light[0].position.y -= (float)(LSPEED * dt);
 	if (Application::IsKeyPressed('P'))
-		light[0].pos.y += (float)(LSPEED * dt);
+		light[0].position.y += (float)(LSPEED * dt);
 
 	sun.rotate -= 1;
 	mercury.rotate -= 0.5;
@@ -117,7 +117,7 @@ void SceneLight::RenderMesh(Mesh* mesh, bool enableLight) {
 
 void SceneLight::Render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	Position lightPosition_cameraspace = viewStack.Top() * light[0].pos;
+	Position lightPosition_cameraspace = viewStack.Top() * light[0].position;
 	glUniform3fv(m_parameters[U_LIGHT0_POSITION], 1, &lightPosition_cameraspace.x);
 
 	viewStack.LoadIdentity();
@@ -135,12 +135,12 @@ void SceneLight::Render() {
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(light[0].pos.x, light[0].pos.y, light[0].pos.z);
+	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
 	RenderMesh(meshList[GEO_LIGHT], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(0, -10, 0);
+	modelStack.Translate(0, -5, 0);
 	modelStack.Rotate(90, 1, 0, 0);
 	RenderMesh(meshList[GEO_QUAD], true);
 	modelStack.PopMatrix();
