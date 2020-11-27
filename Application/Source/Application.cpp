@@ -14,21 +14,20 @@
 #include "Scene2.h"
 #include "Scene4.h"
 #include "Scene5.h"
+#include "SceneLight.h"
 
 GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
 const unsigned int frameTime = 1000 / FPS; // time for each frame
 
 //Define an error callback
-static void error_callback(int error, const char* description)
-{
+static void error_callback(int error, const char* description) {
 	fputs(description, stderr);
 	_fgetchar();
 }
 
 //Define the key input callback
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 }
@@ -37,29 +36,20 @@ void resize_callback(GLFWwindow* window, int w, int h) {
 	glViewport(0, 0, w, h);
 }
 
-bool Application::IsKeyPressed(unsigned short key)
-{
+bool Application::IsKeyPressed(unsigned short key) {
     return ((GetAsyncKeyState(key) & 0x8001) != 0);
 }
 
-Application::Application()
-{
-}
+Application::Application() {}
 
-Application::~Application()
-{
-}
+Application::~Application() {}
 
-void Application::Init()
-{
+void Application::Init() {
 	//Set the error callback
 	glfwSetErrorCallback(error_callback);
 
 	//Initialize GLFW
-	if (!glfwInit())
-	{
-		exit(EXIT_FAILURE);
-	}
+	if (!glfwInit()) exit(EXIT_FAILURE);
 
 	//Set the GLFW window creation hints - these are optional
 	glfwWindowHint(GLFW_SAMPLES, 4); //Request 4x antialiasing
@@ -70,12 +60,11 @@ void Application::Init()
 
 
 	//Create a window and create its OpenGL context
-	m_window = glfwCreateWindow(1280, 720, "Week 1", NULL, NULL);
+	m_window = glfwCreateWindow(800, 600, "Week 6", NULL, NULL);
 	glfwSetWindowSizeCallback(m_window, resize_callback);
 
 	//If the window couldn't be created
-	if (!m_window)
-	{
+	if (!m_window) {
 		fprintf( stderr, "Failed to open GLFW window.\n" );
 		glfwTerminate();
 		exit(EXIT_FAILURE);
@@ -92,22 +81,16 @@ void Application::Init()
 	GLenum err = glewInit();
 
 	//If GLEW hasn't initialized
-	if (err != GLEW_OK) 
-	{
-		fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-		//return -1;
-	}
+	if (err != GLEW_OK) fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 }
 
-void Application::Run()
-{
+void Application::Run() {
 	//Main Loop
-	Scene *scene = new Scene5();
+	Scene *scene = new SceneLight();
 	scene->Init();
 
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
-	while (!glfwWindowShouldClose(m_window) && !IsKeyPressed(VK_ESCAPE))
-	{
+	while (!glfwWindowShouldClose(m_window) && !IsKeyPressed(VK_ESCAPE)) {
 		scene->Update(m_timer.getElapsedTime());
 		scene->Render();
 		//Swap buffers
@@ -121,8 +104,7 @@ void Application::Run()
 	delete scene;
 }
 
-void Application::Exit()
-{
+void Application::Exit() {
 	//Close OpenGL window and terminate GLFW
 	glfwDestroyWindow(m_window);
 	//Finalize and clean up GLFW

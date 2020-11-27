@@ -7,7 +7,6 @@ Scene5::Scene5() {
 
 Scene5::~Scene5() {
 }
-
 void Scene5::Init() {
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 	m_programID = LoadShaders(
@@ -23,17 +22,13 @@ void Scene5::Init() {
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("reference", 100);
 	meshList[GEO_SUN] = MeshBuilder::GenerateSphere("sun", Color(1, 1, 0), 5);
 	meshList[GEO_MERCURY] = MeshBuilder::GenerateSphere("mercury", Color(0.3, 0.3, 0.3), 1);
-	//meshList[GEO_RING] = MeshBuilder::GenerateRing("ring", Color(1, 1, 1), 5);
-	rotateAngle = 0;
-	rotateAngle2 = 0;
-	scaleAll = 1;
+
 	Mtx44 projection; 
 	projection.SetToPerspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
 	projectionStack.LoadMatrix(projection);
 	camera.Init(Vector3(25, 0, 3), Vector3(0, 0, 0), Vector3(0, 1, 0));
 
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_CULL_FACE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
@@ -50,9 +45,6 @@ void Scene5::Update(double dt) {
 	if (Application::IsKeyPressed('4')) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
-
-	rotateAngle -= 1;
-	rotateAngle2 -= 0.5;
 	camera.Update(dt);
 }
 
@@ -71,29 +63,18 @@ void Scene5::Render() {
 	meshList[GEO_AXES]->Render();
 
 	modelStack.PushMatrix();
-	modelStack.Rotate(rotateAngle, 0, 1, 0);
 	MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
 	glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
 	meshList[GEO_SUN]->Render();
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Rotate(rotateAngle2, 0, 1, 0);
 	modelStack.Translate(15, 0, 0);
-	modelStack.Rotate(rotateAngle, 0, 1, 0);
 	//modelStack.Scale(0.5, 0.5, 0.5);
 	MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
 	glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
 	meshList[GEO_MERCURY]->Render();
 	modelStack.PopMatrix();
-
-	/*modelStack.PushMatrix();
-	modelStack.Translate(-5, 0, 0);
-	modelStack.Rotate(rotateAngle, 1, 0, 0);
-	MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
-	glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
-	meshList[GEO_RING]->Render();
-	modelStack.PopMatrix();*/
 }
 
 void Scene5::Exit() {

@@ -2,11 +2,11 @@
 #define MESH_H
 
 #include <string>
+#include "Material.h"
 
 class Mesh {
 public:
-	enum DRAW_MODE
-	{
+	enum DRAW_MODE {
 		DRAW_TRIANGLES, //default mode
 		DRAW_TRIANGLE_STRIP,
 		DRAW_LINES,
@@ -18,6 +18,7 @@ public:
 	void Render();
 
 	const std::string name;
+	Material material;
 	DRAW_MODE mode;
 	unsigned vertexBuffer;
 	unsigned indexBuffer;
