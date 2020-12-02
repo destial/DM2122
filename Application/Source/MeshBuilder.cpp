@@ -86,15 +86,15 @@ Mesh* MeshBuilder::GenerateCube(const std::string &meshName, Color color, float 
 	std::vector<GLuint> index_buffer_data;
 	v.color = color;
 	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
-	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, 0.5f * lengthZ);  vertex_buffer_data.push_back(v);
-	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, 0.5f * lengthZ);	 vertex_buffer_data.push_back(v);
-	v.pos.Set(0.5f * lengthX, 0.5f * lengthY, -0.5f * lengthZ);	 vertex_buffer_data.push_back(v);
-	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ);  vertex_buffer_data.push_back(v);
-	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, -0.5f * lengthZ);  vertex_buffer_data.push_back(v);
+	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, 0.5f * lengthZ); vertex_buffer_data.push_back(v);
+	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, 0.5f * lengthZ);	vertex_buffer_data.push_back(v);
+	v.pos.Set(0.5f * lengthX, 0.5f * lengthY, -0.5f * lengthZ);	vertex_buffer_data.push_back(v);
+	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
+	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
 
-	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, 0.5f * lengthZ);		vertex_buffer_data.push_back(v);
-	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ);		vertex_buffer_data.push_back(v);
-	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ);		vertex_buffer_data.push_back(v);
+	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, 0.5f * lengthZ);	vertex_buffer_data.push_back(v);
+	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
+	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(0.5f * lengthX, 0.5f * lengthY, -0.5f * lengthZ);	vertex_buffer_data.push_back(v);
 	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);

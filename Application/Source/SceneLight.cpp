@@ -29,7 +29,7 @@ void SceneLight::Init() {
 	m_parameters[U_LIGHTENABLED] = glGetUniformLocation(m_programID, "lightEnabled");
 	glUseProgram(m_programID);
 
-	light[0].position.Set(0, 5, 0);
+	light[0].position.Set(0, 2, 0);
 	light[0].color.Set(1, 1, 1);
 	light[0].power = 1;
 	light[0].kC = 1.f;
