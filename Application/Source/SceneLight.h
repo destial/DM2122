@@ -36,7 +36,6 @@ class SceneLight : public Scene {
 		U_LIGHT0_KL,
 		U_LIGHT0_KQ,
 		U_LIGHTENABLED,
-
 		U_TOTAL
 	};
 	Mesh* meshList[NUM_GEOMETRY];

@@ -158,15 +158,15 @@ Mesh* MeshBuilder::GenerateCube(const std::string& meshName, float lengthX, floa
 	return GenerateCube(meshName, v.color, lengthX, lengthY, lengthZ);
 }
 
-float sphereX(float& phi, float& theta) {
+float sphereX(double& phi, double& theta) {
 	return (cos(phi) * cos(theta));
 }
 
-float sphereY(float& phi, float& theta) {
+float sphereY(double& phi, double& theta) {
 	return (sin(phi));
 }
 
-float sphereZ(float& phi, float& theta) {
+float sphereZ(double& phi, double& theta) {
 	return (cos(phi) * sin(theta));
 }
 
@@ -175,21 +175,18 @@ Mesh* MeshBuilder::GenerateSphere(const std::string& meshName, Color color, unsi
 	std::vector<Vertex> vertex_buffer_data;
 	std::vector<GLuint> index_buffer_data;
 	v.color = color;
-	float degreePerStack = Math::PI / numStack;
-	float degreePerSlice = Math::TWO_PI / numSlice;
-
+	unsigned index = 0;
+	double pi = Math::PI;
+	double degreePerStack = pi / numStack;
+	double degreePerSlice = (2 * pi) / numSlice;
 	for (unsigned stack = 0; stack < numStack + 1; ++stack) {
-		float phi = -(Math::HALF_PI) + stack * degreePerStack;
+		double phi = -(pi / 2) + stack * degreePerStack;
 		for (unsigned slice = 0; slice < numSlice + 1; ++slice) {
-			float theta = slice * degreePerSlice;
+			double theta = slice * degreePerSlice;
 			v.pos.Set(radius * sphereX(phi, theta), radius * sphereY(phi, theta), radius * sphereZ(phi, theta));
 			v.normal.Set(sphereX(phi, theta), sphereY(phi, theta), sphereZ(phi, theta));
 			v.normal.Normalized();
 			vertex_buffer_data.push_back(v);
-		}
-	}
-	for (unsigned stack = 0; stack < numStack; ++stack) {
-		for (unsigned slice = 0; slice < numSlice + 1; ++slice) {
 			index_buffer_data.push_back((numSlice + 1) * stack + slice + 0);
 			index_buffer_data.push_back((numSlice + 1) * (stack + 1) + slice + 0);
 		}
