@@ -42,17 +42,16 @@ void SceneLight::Init() {
 	glUniform1f(m_parameters[U_LIGHT0_KL], light[0].kL);
 	glUniform1f(m_parameters[U_LIGHT0_KQ], light[0].kQ);
 
-
 	glGenVertexArrays(1, &m_vertexArrayID);
 	glBindVertexArray(m_vertexArrayID);
 
 	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("reference", 100);
-	meshList[GEO_SUN] = MeshBuilder::GenerateSphere("sun", 5);
+	meshList[GEO_SUN] = MeshBuilder::GenerateSphere("sun", 50);
 	meshList[GEO_SUN]->material.kAmbient.Set(0.f, 0.f, 0.f);
 	meshList[GEO_SUN]->material.kDiffuse.Set(0.f, 0.f, 0.f);
 	meshList[GEO_SUN]->material.kSpecular.Set(0.f, 0.f, 0.f);
 	meshList[GEO_SUN]->material.kShininess = 1.f;
-	meshList[GEO_LIGHT] = MeshBuilder::GenerateSphere("light", Color(1.f, 1.f, 1.f), 2);
+	meshList[GEO_LIGHT] = MeshBuilder::GenerateSphere("light", Color(1.f, 1.f, 1.f), 20);
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("floor", Color(1.f, 1.f, 1.f), 50);
 
 	Mtx44 projection; 
