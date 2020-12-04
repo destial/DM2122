@@ -13,11 +13,6 @@ struct Position {
 		this->y = y;
 		this->z = z;
 	}
-	void Set(Position& pos) {
-		this->x = pos.x;
-		this->y = pos.y;
-		this->z = pos.z;
-	}
 };
 
 struct Color {
@@ -29,11 +24,6 @@ struct Color {
 		this->r = r;
 		this->g = g;
 		this->b = b;
-	}
-	void Set(Color &color) {
-		this->r = color.r;
-		this->g = color.g;
-		this->b = color.b;
 	}
 };
 

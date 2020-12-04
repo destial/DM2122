@@ -8,32 +8,31 @@ Mesh* MeshBuilder::GenerateAxes(const std::string &meshName, float lengthX, floa
 	std::vector<Vertex> vertex_buffer_data;
 	std::vector<GLuint> index_buffer_data;
 	Vertex v;
-	v.pos.Set(lengthX, 0.f, 0.f); v.color.Set(1.f, 0, 0); vertex_buffer_data.push_back(v);
-	v.pos.Set(-(lengthX), 0.f, 0.f); v.color.Set(1.f, 0, 0); vertex_buffer_data.push_back(v);
-	v.pos.Set(0.f, lengthY, 0.f); v.color.Set(0, 1.f, 0); vertex_buffer_data.push_back(v);
-	v.pos.Set(0.f, -(lengthY), 0.f); v.color.Set(0, 1.f, 0); vertex_buffer_data.push_back(v);
-	v.pos.Set(0.f, 0.f, lengthZ); v.color.Set(0, 0, 1.f); vertex_buffer_data.push_back(v);
-	v.pos.Set(0.f, 0.f, -(lengthZ)); v.color.Set(0, 0, 1.f); vertex_buffer_data.push_back(v);
+	v.color.Set(1.f, 0, 0);
+	v.pos.Set(lengthX, 0.f, 0.f); vertex_buffer_data.push_back(v);
+	v.pos.Set(-lengthX, 0.f, 0.f); vertex_buffer_data.push_back(v);
+
+	v.color.Set(0, 1.f, 0);
+	v.pos.Set(0.f, lengthY, 0.f); vertex_buffer_data.push_back(v);
+	v.pos.Set(0.f, -lengthY, 0.f); vertex_buffer_data.push_back(v);
+
+	v.color.Set(0, 0, 1.f);
+	v.pos.Set(0.f, 0.f, lengthZ); vertex_buffer_data.push_back(v);
+	v.pos.Set(0.f, 0.f, -lengthZ); vertex_buffer_data.push_back(v);
+
 	for (unsigned i = 0; i < vertex_buffer_data.size(); i++) {
 		index_buffer_data.push_back(i);
 	}
+
 	Mesh* mesh = new Mesh(meshName);
-	mesh->indexSize = index_buffer_data.size();
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, vertex_buffer_data.size() * sizeof(Vertex), &vertex_buffer_data[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_data.size() * sizeof(GLuint), &index_buffer_data[0], GL_STATIC_DRAW);
+	mesh->indexSize = index_buffer_data.size();
 	mesh->mode = Mesh::DRAW_LINES;
 	return mesh;
-}
-
-Mesh* MeshBuilder::GenerateAxes(const std::string& meshName) {
-	return GenerateAxes(meshName, 100, 100, 100);
-}
-
-Mesh* MeshBuilder::GenerateAxes(const std::string& meshName, float length) {
-	return GenerateAxes(meshName, length, length, length);
 }
 
 Mesh* MeshBuilder::GenerateQuad(const std::string &meshName, Color color, float lengthX, float lengthY) {
@@ -41,13 +40,18 @@ Mesh* MeshBuilder::GenerateQuad(const std::string &meshName, Color color, float 
 	std::vector<Vertex> vertex_buffer_data;
 	std::vector<GLuint> index_buffer_data;
 	v.color = color;
-	v.pos.Set(0.5f * lengthX, 0.5f * lengthY, 0.f);	v.normal.Set(0, 0, 1);
+	v.normal.Set(0, 0, 1.f);
+
+	v.pos.Set(0.5f * lengthX, 0.5f * lengthY, 0.f);	
 	vertex_buffer_data.push_back(v);
-	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, 0.f); v.normal.Set(0, 0, 1);
+
+	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, 0.f); 
 	vertex_buffer_data.push_back(v);
-	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, 0.f); v.normal.Set(0, 0, 1);
+
+	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, 0.f); 
 	vertex_buffer_data.push_back(v);
-	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, 0.f); v.normal.Set(0, 0, 1);
+
+	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, 0.f); 
 	vertex_buffer_data.push_back(v);
 
 	index_buffer_data.push_back(0);
@@ -66,18 +70,9 @@ Mesh* MeshBuilder::GenerateQuad(const std::string &meshName, Color color, float 
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_data.size() * sizeof(GLuint), &index_buffer_data[0], GL_STATIC_DRAW);
 
 	mesh->indexSize = index_buffer_data.size();
-	mesh->mode = Mesh::DRAW_TRIANGLES;
+	mesh->mode = Mesh::DRAW_TRIANGLE_STRIP;
 
 	return mesh;
-}
-
-Mesh* MeshBuilder::GenerateQuad(const std::string& meshName, float length) {
-	Vertex v;
-	return GenerateQuad(meshName, v.color, length, length);
-}
-
-Mesh* MeshBuilder::GenerateQuad(const std::string& meshName, Color color, float length) {
-	return GenerateQuad(meshName, color, length, length);
 }
 
 Mesh* MeshBuilder::GenerateCube(const std::string &meshName, Color color, float lengthX, float lengthY, float lengthZ) {
@@ -144,20 +139,6 @@ Mesh* MeshBuilder::GenerateCube(const std::string &meshName, Color color, float 
 	return mesh;
 }
 
-Mesh* MeshBuilder::GenerateCube(const std::string &meshName, float size) {
-	Vertex v;
-	return GenerateCube(meshName, v.color, size, size, size);
-}
-
-Mesh* MeshBuilder::GenerateCube(const std::string& meshName, Color color, float size) {
-	return GenerateCube(meshName, color, size, size, size);
-}
-
-Mesh* MeshBuilder::GenerateCube(const std::string& meshName, float lengthX, float lengthY, float lengthZ) {
-	Vertex v;
-	return GenerateCube(meshName, v.color, lengthX, lengthY, lengthZ);
-}
-
 float sphereX(double& phi, double& theta) {
 	return (cos(phi) * cos(theta));
 }
@@ -185,10 +166,14 @@ Mesh* MeshBuilder::GenerateSphere(const std::string& meshName, Color color, unsi
 			double theta = slice * degreePerSlice;
 			v.pos.Set(radius * sphereX(phi, theta), radius * sphereY(phi, theta), radius * sphereZ(phi, theta));
 			v.normal.Set(sphereX(phi, theta), sphereY(phi, theta), sphereZ(phi, theta));
-			v.normal.Normalized();
+			//v.normal.Normalized();
 			vertex_buffer_data.push_back(v);
-			index_buffer_data.push_back((numSlice + 1) * stack + slice + 0);
-			index_buffer_data.push_back((numSlice + 1) * (stack + 1) + slice + 0);
+		}
+	}
+	for (unsigned stack = 0; stack < numStack + 1; ++stack) {
+		for (unsigned slice = 0; slice < numSlice + 1; ++slice) {
+			index_buffer_data.push_back((numSlice + 1) * stack + slice);
+			index_buffer_data.push_back((numSlice + 1) * (stack + 1) + slice );
 		}
 	}
 
@@ -203,15 +188,6 @@ Mesh* MeshBuilder::GenerateSphere(const std::string& meshName, Color color, unsi
 	mesh->mode = Mesh::DRAW_TRIANGLE_STRIP;
 
 	return mesh;
-}
-
-Mesh* MeshBuilder::GenerateRing(const std::string& meshName, float radius) {
-	Vertex v;
-	return GenerateRing(meshName, v.color, 30, 30, radius-5, radius);
-}
-
-Mesh* MeshBuilder::GenerateRing(const std::string& meshName, Color color, float radius) {
-	return GenerateRing(meshName, color, 30, 30, radius-5, radius);
 }
 
 Mesh* MeshBuilder::GenerateRing(const std::string& meshName, Color color, unsigned numStack, unsigned numSlice, float innerRadius, float outerRadius) {
@@ -230,8 +206,8 @@ Mesh* MeshBuilder::GenerateRing(const std::string& meshName, Color color, unsign
 			z2 = (outerRadius + innerRadius * cos(slice * degreePerSlice)) * cos(stack * degreePerStack);
 			y2 = innerRadius * sin(slice * degreePerSlice);
 			x2 = (outerRadius + innerRadius * cos(slice * degreePerSlice)) * sin(stack * degreePerStack);
-			v.pos.Set(x2, y2, z2); v.color.Set(color); vertex_buffer_data.push_back(v);
-			v.pos.Set(x2-x1, y2, z2-z1); v.color.Set(color); vertex_buffer_data.push_back(v);
+			v.pos.Set(x2, y2, z2); v.color = color; vertex_buffer_data.push_back(v);
+			v.pos.Set(x2-x1, y2, z2-z1); v.color = color; vertex_buffer_data.push_back(v);
 		}
 	}
 	for (unsigned stack = 0; stack < numStack; ++stack) {
@@ -253,29 +229,102 @@ Mesh* MeshBuilder::GenerateRing(const std::string& meshName, Color color, unsign
 	return mesh;
 }
 
-Mesh* MeshBuilder::GenerateSphere(const std::string& meshName, float radius) {
-	Vertex v;
-	return GenerateSphere(meshName, v.color, 36, 36, radius);
-}
-
-Mesh* MeshBuilder::GenerateSphere(const std::string& meshName, Color color, float radius) {
-	return GenerateSphere(meshName, color, 36, 36, radius);
-}
-
-Mesh* MeshBuilder::GenerateCircle(const std::string& meshName, Color color, unsigned numSlice, float radius = 1.f) {
+Mesh* MeshBuilder::GenerateCylinder(const std::string& meshName, Color color, unsigned numSlice, float radius, float height) {
 	Vertex v;
 	std::vector<Vertex> vertex_buffer_data;
 	std::vector<GLuint> index_buffer_data;
 
 	float degree = Math::TWO_PI / numSlice;
 
-	v.pos.Set(0, 0, 0);  vertex_buffer_data.push_back(v);
-	for (int i = 0; i < numSlice+1; ++i) {
-		float theta = i*degree;
-		v.pos.Set(radius*cos(theta), 0, radius*sin(theta)); 
-		v.color.Set(color); 
+	// bottom circle
+	v.pos.Set(0, -0.5f * height, 0);
+	v.normal.Set(0, -1, 0);
+	v.color = color;
+	vertex_buffer_data.push_back(v);
+	for (unsigned slice = 0; slice < numSlice + 1; ++slice) {
+		float theta = slice * degree;
+		v.pos.Set(radius * cos(theta), -0.5f * height, radius * sin(theta));
+		v.normal.Set(0, -1, 0);
 		vertex_buffer_data.push_back(v);
-		index_buffer_data.push_back(i + 1);
+		index_buffer_data.push_back(0);
+		index_buffer_data.push_back(slice + 1);
+	}
+
+	// curve
+	unsigned cylinderStartIndex = vertex_buffer_data.size();
+	for (unsigned slice = 0; slice < numSlice + 1; ++slice) {
+		float theta = slice * degree;
+		// bottom
+		v.pos.Set(radius * cos(theta), -0.5f * height, radius * sin(theta));
+		v.normal.Set(cos(theta), 0, sin(theta));
+		vertex_buffer_data.push_back(v);
+
+		// top
+		v.pos.Set(radius * cos(theta), 0.5f * height, radius * sin(theta));
+		v.normal.Set(cos(theta), 0, sin(theta));
+		vertex_buffer_data.push_back(v);
+		index_buffer_data.push_back(cylinderStartIndex + 2 * slice + 0);
+		index_buffer_data.push_back(cylinderStartIndex + 2 * slice + 1);
+	}
+
+	// top circle
+	unsigned circleStartIndex = vertex_buffer_data.size();
+	v.pos.Set(0, 0.5f * height, 0);
+	v.normal.Set(0, 1, 0);
+	vertex_buffer_data.push_back(v);
+	for (unsigned slice = 0; slice < numSlice + 1; ++slice) {
+		float theta = slice * degree;
+		v.pos.Set(radius * cos(theta), 0.5f * height, radius * sin(theta));
+		v.normal.Set(0, 1, 0);
+		vertex_buffer_data.push_back(v);
+		index_buffer_data.push_back(circleStartIndex + slice + 1);
+		index_buffer_data.push_back(circleStartIndex + 0);
+	}
+
+	Mesh* mesh = new Mesh(meshName);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, vertex_buffer_data.size() * sizeof(Vertex), &vertex_buffer_data[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_data.size() * sizeof(GLuint), &index_buffer_data[0], GL_STATIC_DRAW);
+
+	mesh->indexSize = index_buffer_data.size();
+	mesh->mode = Mesh::DRAW_TRIANGLE_STRIP;
+
+	return mesh;
+}
+
+Mesh* MeshBuilder::GenerateCone(const std::string& meshName, Color color, unsigned numSlice, float radius, float height) {
+	Vertex v;
+	std::vector<Vertex> vertex_buffer_data;
+	std::vector<GLuint> index_buffer_data;
+
+	float degree = Math::TWO_PI / numSlice;
+	v.pos.Set(0, 0, 0);
+	v.normal.Set(0, -1, 0);
+	vertex_buffer_data.push_back(v);
+	v.color = color;
+	for (unsigned slice = 0; slice < numSlice + 1; ++slice) {
+		float theta = slice * degree;
+		v.pos.Set(radius * cos(theta), -0.5f * height, radius * sin(theta));
+		v.normal.Set(height * cos(theta), radius, height * sin(theta));
+		vertex_buffer_data.push_back(v);
+		v.pos.Set(0, 0.5f * height, 0);
+		v.normal.Set(height * cos(theta), radius, height * sin(theta));
+		vertex_buffer_data.push_back(v);
+	}
+
+	for (unsigned slice = 0; slice < numSlice + 1; ++slice) {
+		float theta = slice * degree;
+		v.pos.Set(0, -0.5f * height, 0);
+		v.normal.Set(0, -1, 0);
+		vertex_buffer_data.push_back(v);
+		v.pos.Set(radius * cos(theta), 0, radius * sin(theta));
+		v.normal.Set(0, -1, 0);
+		vertex_buffer_data.push_back(v);
+	}
+
+	for (unsigned slice = 0; slice < numSlice + 1; ++slice) {
+		index_buffer_data.push_back(slice+1);
 		index_buffer_data.push_back(0);
 	}
 
@@ -291,11 +340,32 @@ Mesh* MeshBuilder::GenerateCircle(const std::string& meshName, Color color, unsi
 	return mesh;
 }
 
-Mesh* MeshBuilder::GenerateCircle(const std::string& meshName, Color color, unsigned numSlice) {
-	return GenerateCircle(meshName, color, numSlice, 1);
-}
-
-Mesh* MeshBuilder::GenerateCircle(const std::string& meshName, float radius) {
+Mesh* MeshBuilder::GenerateCircle(const std::string& meshName, Color color, unsigned numSlice, float radius = 1.f) {
 	Vertex v;
-	return GenerateCircle(meshName, v.color, 20, radius);
+	std::vector<Vertex> vertex_buffer_data;
+	std::vector<GLuint> index_buffer_data;
+
+	float degree = Math::TWO_PI / numSlice;
+	v.pos.Set(0, 0, 0);
+	v.normal.Set(0, 1, 0);
+	vertex_buffer_data.push_back(v);
+	v.color = color;
+	for (int i = 0; i < numSlice+1; ++i) {
+		float theta = i*degree;
+		v.pos.Set(radius*cos(theta), 0, radius*sin(theta)); 
+		vertex_buffer_data.push_back(v);
+		index_buffer_data.push_back(i + 1);
+		index_buffer_data.push_back(0);
+	}
+
+	Mesh* mesh = new Mesh(meshName);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, vertex_buffer_data.size() * sizeof(Vertex), &vertex_buffer_data[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_data.size() * sizeof(GLuint), &index_buffer_data[0], GL_STATIC_DRAW);
+
+	mesh->indexSize = index_buffer_data.size();
+	mesh->mode = Mesh::DRAW_TRIANGLE_STRIP;
+
+	return mesh;
 }

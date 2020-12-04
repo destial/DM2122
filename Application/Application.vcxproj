@@ -154,9 +154,8 @@
     <ClCompile Include="Source\MeshBuilder.cpp" />
     <ClCompile Include="Source\Scene1.cpp" />
     <ClCompile Include="Source\Scene2.cpp" />
-    <ClCompile Include="Source\Scene4.cpp" />
-    <ClCompile Include="Source\Scene5.cpp" />
     <ClCompile Include="Source\SceneLight.cpp" />
+    <ClCompile Include="Source\SceneLight2.cpp" />
     <ClCompile Include="Source\shader.cpp" />
     <ClCompile Include="Source\Utility.cpp" />
   </ItemGroup>
@@ -170,9 +169,8 @@
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\Scene1.h" />
     <ClInclude Include="Source\Scene2.h" />
-    <ClInclude Include="Source\Scene4.h" />
-    <ClInclude Include="Source\Scene5.h" />
     <ClInclude Include="Source\SceneLight.h" />
+    <ClInclude Include="Source\SceneLight2.h" />
     <ClInclude Include="Source\shader.hpp" />
     <ClInclude Include="Source\Utility.h" />
   </ItemGroup>
