@@ -23,6 +23,7 @@ class SceneLight2 : public Scene {
 		GEO_CIRCLE,
 		GEO_CYL,
 		GEO_CONE,
+		GEO_CUBE,
 		NUM_GEOMETRY,
 	};
 	enum UNIFORM_TYPE {

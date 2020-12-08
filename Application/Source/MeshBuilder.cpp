@@ -102,7 +102,7 @@ Mesh* MeshBuilder::GenerateCube(const std::string &meshName, Color color, float 
 	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
 
 	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, 0.5f * lengthZ);	vertex_buffer_data.push_back(v);
-	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, 0.5f * lengthZ);  vertex_buffer_data.push_back(v);
+	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, 0.5f * lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, 0.5f * lengthZ);	vertex_buffer_data.push_back(v);
 	v.pos.Set(0.5f * lengthX, 0.5f * lengthY, 0.5f * lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
@@ -119,7 +119,7 @@ Mesh* MeshBuilder::GenerateCube(const std::string &meshName, Color color, float 
 	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, 0.5f * lengthZ);	vertex_buffer_data.push_back(v);
 	v.pos.Set(0.5f * lengthX, 0.5f * lengthY, 0.5f * lengthZ); vertex_buffer_data.push_back(v);
-	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, 0.5f * lengthZ);  vertex_buffer_data.push_back(v);
+	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, 0.5f * lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, 0.5f * lengthZ); vertex_buffer_data.push_back(v);
 
 	for (unsigned i = 0; i < 36; ++i) {
@@ -166,7 +166,7 @@ Mesh* MeshBuilder::GenerateSphere(const std::string& meshName, Color color, unsi
 			double theta = slice * degreePerSlice;
 			v.pos.Set(radius * sphereX(phi, theta), radius * sphereY(phi, theta), radius * sphereZ(phi, theta));
 			v.normal.Set(sphereX(phi, theta), sphereY(phi, theta), sphereZ(phi, theta));
-			//v.normal.Normalized();
+			v.normal.Normalized();
 			vertex_buffer_data.push_back(v);
 		}
 	}

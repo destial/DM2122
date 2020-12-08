@@ -50,7 +50,7 @@ void SceneLight2::Init() {
 
 	light[0].type = Light::LIGHT_DIRECTIONAL;
 	light[0].position.Set(0, 10, 0);
-	light[0].color.Set(1, 1, 1);
+	light[0].color.Set(0, 0, 1);
 	light[0].power = 1;
 	light[0].kC = 1.f;
 	light[0].kL = 0.01f;
@@ -63,7 +63,7 @@ void SceneLight2::Init() {
 	light[1].type = Light::LIGHT_SPOT;
 	light[1].position.Set(0, 10, 10);
 	light[1].color.Set(1, 0, 0);
-	light[1].power = 1;
+	light[1].power = 2;
 	light[1].kC = 1.f;
 	light[1].kL = 0.01f;
 	light[1].kQ = 0.001f;
@@ -92,7 +92,7 @@ void SceneLight2::Init() {
 	glUniform1f(m_parameters[U_LIGHT1_COSINNER], light[1].cosInner);
 	glUniform1f(m_parameters[U_LIGHT1_EXPONENT], light[1].exponent);
 
-	glUniform1i(m_parameters[U_NUMLIGHTS], 1);
+	glUniform1i(m_parameters[U_NUMLIGHTS], (sizeof(light)/sizeof(light[0])));
 	
 	glGenVertexArrays(1, &m_vertexArrayID);
 	glBindVertexArray(m_vertexArrayID);
@@ -103,6 +103,7 @@ void SceneLight2::Init() {
 	meshList[GEO_CYL] = MeshBuilder::GenerateCylinder("cyl", WHITE, 30, 1, 10);
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("floor", Color(0.9f, 0.9f, 0.9f), 5, 5);
 	meshList[GEO_CONE] = MeshBuilder::GenerateCone("cone", Color(0.9f, 0.9f, 0.9f), 30, 1, 5);
+	meshList[GEO_CUBE] = MeshBuilder::GenerateCube("cube", Color(.6f, .6f, .0f), 1, 5, 5);
 	meshList[GEO_SUN] = MeshBuilder::GenerateSphere("sun", Color(.6f, .6f, 0.f), 30, 30, 1);
 	meshList[GEO_SUN]->material.kShininess = 0.5f;
 	//meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("floor", Color(0.9f, 0.9f, 0.9f), 50, 50);
@@ -156,6 +157,7 @@ void SceneLight2::Update(double dt) {
 		light[1].type = Light::LIGHT_SPOT;
 		glUniform1i(m_parameters[U_LIGHT1_TYPE], light[1].type);
 	}
+
 	unsigned LSPEED = 10.f;
 	if (Application::IsKeyPressed('I'))
 		light[0].position.z -= (float)(LSPEED * dt);
@@ -342,14 +344,24 @@ void SceneLight2::Exit() {
 }
 
 void SceneLight2::assignment() {
-	modelStack.PushMatrix();
-	modelStack.Scale(3, 3, 3);
-	RenderMesh(meshList[GEO_CYL], true);
-	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(10, 0, 0);
+	modelStack.Translate(0, 0, 0);
 	modelStack.Scale(3, 3, 3);
-	RenderMesh(meshList[GEO_CONE], true);
+	RenderMesh(meshList[GEO_CUBE], false);
 	modelStack.PopMatrix();
+
+	for (int n = 0; n < 9; n++) {
+		for (int x = 0; x < 12; x += 5) {
+			for (int y = 0; y < 11; y += 5) {
+				modelStack.PushMatrix();
+				modelStack.Translate(x, 0, y);
+				modelStack.Scale(3, 3, 3);
+				RenderMesh(meshList[GEO_SUN], false);
+				modelStack.PopMatrix();
+				if (x == 5) y = 0;
+				x++;
+			}
+		}
+	}
 }
