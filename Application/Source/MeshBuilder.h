@@ -16,6 +16,8 @@ public:
 
 	static Mesh* GenerateSphere(const std::string& meshName, Color color, unsigned numStack, unsigned numSlice, float radius);
 
+	static Mesh* GenerateQuarterTorus(const std::string& meshName, Color color, unsigned numStack, unsigned numSlice, float outerR, float innerR);
+
 	static Mesh* GenerateRing(const std::string& meshName, Color color, unsigned numStack, unsigned numSlice, float innerRadius, float outerRadius);
 
 	static Mesh* GenerateCylinder(const std::string& meshName, Color color, unsigned numSlice, float radius, float height);

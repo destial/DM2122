@@ -31,20 +31,23 @@ struct Transform {
 	float rotate;
 	float translateX;
 	float translateY;
+	float translateZ;
 	float scale;
-	Transform(float r = 0, float tX = 0, float tY = 0, float s = 1) {
-		Set(r, tX, tY, s);
+	Transform(float r = 0, float tX = 0, float tY = 0, float tZ = 0, float s = 1) {
+		Set(r, tX, tY, tZ, s);
 	}
-	void Set(float r, float tX, float tY, float s) {
+	void Set(float r, float tX, float tY, float tZ, float s) {
 		this->rotate = r;
 		this->translateX = tX;
 		this->translateY = tY;
+		this->translateZ = tZ;
 		this->scale = s;
 	}
 	void Set(Transform& t) {
 		this->rotate = t.rotate;
 		this->translateX = t.translateX;
 		this->translateY = t.translateY;
+		this->translateZ = t.translateZ;
 		this->scale = t.scale;
 	}
 };

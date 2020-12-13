@@ -1,15 +1,13 @@
-#include "SceneLight2.h"
+#include "AssignmentScene.h"
 #include "Application.h"
 #include "Utility.h"
 #include <iostream>
 
-SceneLight2::SceneLight2() {}
+AssignmentScene::AssignmentScene() {}
 
-SceneLight2::~SceneLight2() {}
+AssignmentScene::~AssignmentScene() {}
 
-bool practical = false;
-
-void SceneLight2::Init() {
+void AssignmentScene::Init() {
 	glClearColor(0.4f, 0.4f, 0.4f, 0.0f);
 	m_programID = LoadShaders("Shader//Shading.vertexshader", "Shader//LightSource.fragmentshader");
 	m_parameters[U_MVP] = glGetUniformLocation(m_programID, "MVP");
@@ -38,8 +36,8 @@ void SceneLight2::Init() {
 
 	light[0].type = Light::LIGHT_DIRECTIONAL;
 	light[0].position.Set(0, 10, 0);
-	light[0].color.Set(0, 0, 1);
-	light[0].power = 1;
+	light[0].color = YELLOW;
+	light[0].power = 5;
 	light[0].kC = 1.f;
 	light[0].kL = 0.01f;
 	light[0].kQ = 0.001f;
@@ -47,6 +45,7 @@ void SceneLight2::Init() {
 	light[0].cosInner = cos(Math::DegreeToRadian(30));
 	light[0].exponent = 3.f;
 	light[0].spotDirection.Set(0.f, 1.f, 0.f);
+	lighton = true;
 
 	glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
 	glUniform3fv(m_parameters[U_LIGHT0_COLOR], 1, &light[0].color.r);
@@ -63,29 +62,31 @@ void SceneLight2::Init() {
 	glGenVertexArrays(1, &m_vertexArrayID);
 	glBindVertexArray(m_vertexArrayID);
 
-	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("reference", 100, 100, 100);
-	meshList[GEO_LIGHT] = MeshBuilder::GenerateSphere("light", WHITE, 30, 30, 1);
-	meshList[GEO_LIGHT2] = MeshBuilder::GenerateSphere("light2", RED, 30, 30, 1);
-	meshList[GEO_CYL] = MeshBuilder::GenerateCylinder("cyl", WHITE, 30, 1, 10);
-	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("floor", Color(0.9f, 0.9f, 0.9f), 5, 5);
-	meshList[GEO_CONE] = MeshBuilder::GenerateCone("cone", Color(0.9f, 0.9f, 0.9f), 30, 1, 5);
-	meshList[GEO_CUBE] = MeshBuilder::GenerateCube("cube", Color(.6f, .6f, .0f), 1, 5, 5);
-	meshList[GEO_SUN] = MeshBuilder::GenerateSphere("sun", Color(.6f, .6f, 0.f), 30, 30, 1);
-	meshList[GEO_SUN]->material.kShininess = 0.5f;
-	//meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("floor", Color(0.9f, 0.9f, 0.9f), 50, 50);
-	//meshList[GEO_CIRCLE] = MeshBuilder::GenerateCircle("circle", Color(1.f, 1.f, 1.f), 30, 20);
+	meshList[GEO_LIGHT] = MeshBuilder::GenerateSphere("light", YELLOW, 30, 30, 1);
+	meshList[GEO_CYL] = MeshBuilder::GenerateCylinder("cyl", BROWN, 30, 0.6f, 10);
+
+	meshList[GEO_CONE] = MeshBuilder::GenerateCone("cone", PURPLE, 30, 1, 5);
+	meshList[GEO_CONE]->material.kShininess = 0.5f;
+
+	meshList[GEO_SPHERE2] = MeshBuilder::GenerateSphere("dot", BLACK, 30, 30, 1);
+	meshList[GEO_SPHERE2]->material.kShininess = 0.5f;
+
+	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("body", WHITE, 30, 30, 1);
+	meshList[GEO_SPHERE]->material.kShininess = 0.5f;
 
 	Mtx44 projection; 
 	projection.SetToPerspective(45.0f, 40.0f / 30.0f, 0.1f, 100.0f);
 	projectionStack.LoadMatrix(projection);
 	camera.Init(Vector3(25, 0, 3), Vector3(0, 0, 0), Vector3(0, 1, 0));
 
+	Reset();
+
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-void SceneLight2::Update(double dt) {
+void AssignmentScene::Update(double dt) {
 	if (Application::IsKeyPressed('1')) {
 		glEnable(GL_CULL_FACE);
 	}
@@ -110,6 +111,16 @@ void SceneLight2::Update(double dt) {
 		light[0].type = Light::LIGHT_SPOT;
 		glUniform1i(m_parameters[U_LIGHT0_TYPE], light[0].type);
 	}
+	if (Application::IsKeyPressed('0')) {
+		lighton = false;
+	}
+	if (Application::IsKeyPressed('9')) {
+		lighton = true;
+	}
+
+	if (Application::IsKeyPressed('R')) {
+		Reset();
+	}
 
 	unsigned LSPEED = 10.f;
 	if (Application::IsKeyPressed('I'))
@@ -126,16 +137,33 @@ void SceneLight2::Update(double dt) {
 		light[0].position.y += (float)(LSPEED * dt);
 
 	camera.Update(dt);
+	
+	if (!hit) {
+		if (head.translateY >= body.translateY - (0.5 * body.scale)) {
+			head.translateY -= 2 * dt;
+			head.translateZ += 2 * dt;
+			head.rotate -= 2 * dt;
+		}
+	}
+	unsigned RSPEED = LSPEED * 5.0f;
+	if (reverse)
+		leftarm.rotate += RSPEED * dt;
+	else
+		leftarm.rotate -= RSPEED * dt;
+	if (leftarm.rotate >= 60) reverse = false;
+	else if (leftarm.rotate <= 30) reverse = true;
+
+	hail.translateY -= 5.0f * dt;
 }
 
-void SceneLight2::RenderMesh(Mesh* mesh, bool enableLight) {
+void AssignmentScene::RenderMesh(Mesh* mesh, bool enableLight) {
 	Mtx44 MVP, modelView, modelView_inverse_transpose;
 
 	MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
 	glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
 	modelView = viewStack.Top() * modelStack.Top();
 	glUniformMatrix4fv(m_parameters[U_MODELVIEW], 1, GL_FALSE, &modelView.a[0]);
-	if (enableLight) {
+	if (enableLight && lighton) {
 		glUniform1i(m_parameters[U_LIGHTENABLED], 1);
 		modelView_inverse_transpose = modelView.GetInverse().GetTranspose();
 		glUniformMatrix4fv(m_parameters[U_MODELVIEW_INVERSE_TRANSPOSE], 1, GL_FALSE, &modelView_inverse_transpose.a[0]);
@@ -149,7 +177,7 @@ void SceneLight2::RenderMesh(Mesh* mesh, bool enableLight) {
 	mesh->Render();
 }
 
-void SceneLight2::Render() {
+void AssignmentScene::Render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	viewStack.LoadIdentity();
@@ -175,103 +203,181 @@ void SceneLight2::Render() {
 		glUniform3fv(m_parameters[U_LIGHT0_POSITION], 1, &lightPosition_cameraspace.x);
 	}
 
-	if (!practical) {
-		assignment();
-		return;
-	}
-
-	RenderMesh(meshList[GEO_AXES], false);
-
-	modelStack.PushMatrix();
-	//modelStack.Translate(0, 0, 0);
-	modelStack.Scale(3, 3, 3);
-	RenderMesh(meshList[GEO_SUN], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(5, 0, 5);
-	modelStack.Scale(3, 3, 3);
-	RenderMesh(meshList[GEO_SUN], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(-5, 0, -5);
-	modelStack.Scale(3, 3, 3);
-	RenderMesh(meshList[GEO_SUN], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(5, 0, -5);
-	modelStack.Scale(3, 3, 3);
-	RenderMesh(meshList[GEO_SUN], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(-5, 0, 5);
-	modelStack.Scale(3, 3, 3);
-	RenderMesh(meshList[GEO_SUN], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(5, 0, 0);
-	modelStack.Scale(3, 3, 3);
-	RenderMesh(meshList[GEO_SUN], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(-5, 0, 0);
-	modelStack.Scale(3, 3, 3);
-	RenderMesh(meshList[GEO_SUN], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(0, 0, 5);
-	modelStack.Scale(3, 3, 3);
-	RenderMesh(meshList[GEO_SUN], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(0, 0, -5);
-	modelStack.Scale(3, 3, 3);
-	RenderMesh(meshList[GEO_SUN], true);
-	modelStack.PopMatrix();
-
+	// Light ball
 	modelStack.PushMatrix();
 	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
+	modelStack.Scale(0.5, 0.5, 0.5);
 	RenderMesh(meshList[GEO_LIGHT], false);
 	modelStack.PopMatrix();
 
+	// Bottom body
 	modelStack.PushMatrix();
-	modelStack.Translate(light[1].position.x, light[1].position.y, light[1].position.z);
-	RenderMesh(meshList[GEO_LIGHT2], false);
+	modelStack.Translate(body.translateX, body.translateY, body.translateZ);
+	modelStack.Scale(body.scale, body.scale, body.scale);
+	RenderMesh(meshList[GEO_SPHERE], true);
+	modelStack.PopMatrix();
+
+	// Middle body
+	modelStack.PushMatrix();
+	modelStack.Translate(middle.translateX, middle.translateY, middle.translateZ);
+	modelStack.Scale(middle.scale, middle.scale, middle.scale);
+	RenderMesh(meshList[GEO_SPHERE], true);
+	modelStack.PopMatrix();
+
+	// Head
+	modelStack.PushMatrix();
+	modelStack.Translate(head.translateX, head.translateY, head.translateZ);
+	modelStack.Rotate(head.rotate, 1, 0, 0);
+	modelStack.Scale(head.scale, head.scale, head.scale);
+	RenderMesh(meshList[GEO_SPHERE], true);
+	modelStack.PopMatrix();
+
+	// Eyes
+	modelStack.PushMatrix();
+	modelStack.Rotate(head.rotate, 1, 0, 0);
+	modelStack.Translate(head.translateX + 1, head.translateY+0.3, head.translateZ - 0.6);
+	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
+	RenderMesh(meshList[GEO_SPHERE2], true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(0, -3, 0);
-	modelStack.Rotate(-90, 1, 0, 0);
-	modelStack.Scale(5, 5, 5);
-	RenderMesh(meshList[GEO_QUAD], true);
+	modelStack.Rotate(head.rotate, 0, 0, 1);
+	modelStack.Translate(head.translateX + 1, head.translateY+0.3, head.translateZ + 0.6);
+	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
+	RenderMesh(meshList[GEO_SPHERE2], true);
 	modelStack.PopMatrix();
+
+	// Middle dots
+	modelStack.PushMatrix();
+	modelStack.Translate(middle.translateX + middle.scale - 0.2, middle.translateY + 1, middle.translateZ);
+	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
+	RenderMesh(meshList[GEO_SPHERE2], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(middle.translateX + middle.scale, middle.translateY, middle.translateZ);
+	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
+	RenderMesh(meshList[GEO_SPHERE2], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(middle.translateX + middle.scale - 0.2, middle.translateY - 1, middle.translateZ);
+	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
+	RenderMesh(meshList[GEO_SPHERE2], true);
+	modelStack.PopMatrix();
+
+	// Bottom body dots
+	modelStack.PushMatrix();
+	modelStack.Translate(body.translateX + body.scale - 0.7, body.translateY + 2, body.translateZ);
+	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
+	RenderMesh(meshList[GEO_SPHERE2], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(body.translateX + body.scale - 0.2, body.translateY + 1, body.translateZ);
+	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
+	RenderMesh(meshList[GEO_SPHERE2], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(body.translateX + body.scale, body.translateY, body.translateZ);
+	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
+	RenderMesh(meshList[GEO_SPHERE2], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(body.translateX + body.scale - 0.2, body.translateY - 1, body.translateZ);
+	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
+	RenderMesh(meshList[GEO_SPHERE2], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(body.translateX + body.scale - 0.7, body.translateY - 2, body.translateZ);
+	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
+	RenderMesh(meshList[GEO_SPHERE2], true);
+	modelStack.PopMatrix();
+
+	// Nose
+	modelStack.PushMatrix();
+	modelStack.Translate(head.translateX+1, head.translateY, head.translateZ);
+	modelStack.Rotate(nose.rotate, 0, 0, 1);
+	modelStack.Scale(nose.scale, nose.scale, nose.scale);
+	RenderMesh(meshList[GEO_CONE], true);
+	modelStack.PopMatrix();
+
+	// Arm
+	modelStack.PushMatrix();
+	modelStack.Translate(middle.translateX, middle.translateY+0.5, middle.translateZ + 2.1);
+	modelStack.Rotate(leftarm.rotate, 1, 0, 0);
+	modelStack.Scale(leftarm.scale, leftarm.scale, leftarm.scale);
+	RenderMesh(meshList[GEO_CYL], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(middle.translateX, middle.translateY+0.5, middle.translateZ - 2.1);
+	modelStack.Rotate(-leftarm.rotate, 1, 0, 0);
+	modelStack.Scale(leftarm.scale, leftarm.scale, leftarm.scale);
+	RenderMesh(meshList[GEO_CYL], true);
+	modelStack.PopMatrix();
+
+	// Snow falling
+	srand(time(NULL));
+	for (unsigned i = 0; i < 100; i++) {
+		float x = rand() % 40 - 20;
+		float y = (rand() % 2 + 3) * hail.translateY;
+		if (y <= -5) {
+			hail.translateY = 5;
+		}
+		float z = rand() % 40 - 20;
+		modelStack.PushMatrix();
+		modelStack.Translate(x, y ,z);
+		unsigned ran = rand() % 2 + 1;
+		if (ran == 1)
+			modelStack.Scale(hail.scale * 1.5, hail.scale * 1.5, hail.scale * 1.5);
+		else if (ran == 2)
+			modelStack.Scale(hail.scale * 0.5, hail.scale * 0.5, hail.scale * 0.5);
+		else
+			modelStack.Scale(hail.scale, hail.scale, hail.scale);
+		RenderMesh(meshList[GEO_SPHERE], true);
+		modelStack.PopMatrix();
+	}
 }
 
-void SceneLight2::Exit() {
-	for (int i = 0; i < NUM_GEOMETRY; i++) {
+void AssignmentScene::Exit() {
+	for (unsigned i = 0; i < NUM_GEOMETRY; i++) {
 		if (meshList[i]) delete meshList[i];
 	}
 	glDeleteProgram(m_programID);
 }
 
-void SceneLight2::assignment() {
+void AssignmentScene::Reset() {
+	light[0].position.Set(0, 10, 0);
+	hit = false;
 
-	modelStack.PushMatrix();
-	modelStack.Translate(0, 0, 0);
-	modelStack.Scale(3, 3, 3);
-	RenderMesh(meshList[GEO_CUBE], false);
-	modelStack.PopMatrix();
+	head.translateX = 0;
+	head.translateY = 6.9;
+	head.translateZ = 0;
+	head.rotate = 0;
+	head.scale = 1.2;
 
-	modelStack.PushMatrix();
-	modelStack.Translate(0, 0, 0);
-	modelStack.Scale(3, 3, 3);
-	RenderMesh(meshList[GEO_CUBE], false);
-	modelStack.PopMatrix();
+	lefteye.scale = 0.2;
+
+	body.translateX = 0;
+	body.translateY = 0;
+	body.translateZ = 0;
+	body.scale = 3;
+
+	middle.translateX = 0;
+	middle.translateY = 4;
+	middle.translateZ = 0;
+	middle.scale = 2;
+
+	nose.rotate = -90;
+	nose.scale = 0.5;
+
+	leftarm.rotate = 40;
+	leftarm.scale = 0.3;
+
+	hail.scale = 0.2;
+	hail.translateY = 10;
 }

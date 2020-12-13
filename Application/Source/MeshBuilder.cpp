@@ -153,9 +153,10 @@ float sphereZ(double& phi, double& theta) {
 
 Mesh* MeshBuilder::GenerateSphere(const std::string& meshName, Color color, unsigned numStack, unsigned numSlice, float radius) {
 	Vertex v;
+	v.color = color;
 	std::vector<Vertex> vertex_buffer_data;
 	std::vector<GLuint> index_buffer_data;
-	v.color = color;
+
 	unsigned index = 0;
 	double pi = Math::PI;
 	double degreePerStack = pi / numStack;
@@ -166,7 +167,8 @@ Mesh* MeshBuilder::GenerateSphere(const std::string& meshName, Color color, unsi
 			double theta = slice * degreePerSlice;
 			v.pos.Set(radius * sphereX(phi, theta), radius * sphereY(phi, theta), radius * sphereZ(phi, theta));
 			v.normal.Set(sphereX(phi, theta), sphereY(phi, theta), sphereZ(phi, theta));
-			v.normal.Normalized();
+			v.normal.Normalize();
+			v.color = color;
 			vertex_buffer_data.push_back(v);
 		}
 	}
@@ -295,37 +297,48 @@ Mesh* MeshBuilder::GenerateCylinder(const std::string& meshName, Color color, un
 
 Mesh* MeshBuilder::GenerateCone(const std::string& meshName, Color color, unsigned numSlice, float radius, float height) {
 	Vertex v;
+	v.color = color;
 	std::vector<Vertex> vertex_buffer_data;
 	std::vector<GLuint> index_buffer_data;
 
-	float degree = Math::TWO_PI / numSlice;
-	v.pos.Set(0, 0, 0);
+	float degree = 360.f / numSlice;
+	unsigned circleStartIndex = vertex_buffer_data.size();
+	v.pos.Set(0, -0.5f * height, 0);
 	v.normal.Set(0, -1, 0);
 	vertex_buffer_data.push_back(v);
-	v.color = color;
+
 	for (unsigned slice = 0; slice < numSlice + 1; ++slice) {
 		float theta = slice * degree;
-		v.pos.Set(radius * cos(theta), -0.5f * height, radius * sin(theta));
-		v.normal.Set(height * cos(theta), radius, height * sin(theta));
+		v.pos.Set(radius * cos(Math::DegreeToRadian(theta)), -0.5f * height, radius * sin(Math::DegreeToRadian(theta)));
+		v.normal.Set(0, -1, 0);
+		v.color = color;
 		vertex_buffer_data.push_back(v);
+	}
+
+	for (unsigned slice = 0; slice < numSlice + 1; ++slice) {
+		index_buffer_data.push_back(circleStartIndex);
+		index_buffer_data.push_back(circleStartIndex + slice + 1);
+	}
+
+	unsigned coneStartIndex = vertex_buffer_data.size();
+	for (unsigned slice = 0; slice < numSlice + 1; ++slice) {
+		float theta = slice * degree;
+		v.pos.Set(radius * cos(Math::DegreeToRadian(theta)), -0.5f * height, radius * sin(Math::DegreeToRadian(theta)));
+		v.normal.Set(height * cos(Math::DegreeToRadian(theta)), radius, height * sin(Math::DegreeToRadian(theta)));
+		v.normal.Normalize();
+		v.color = color;
+		vertex_buffer_data.push_back(v);
+
 		v.pos.Set(0, 0.5f * height, 0);
-		v.normal.Set(height * cos(theta), radius, height * sin(theta));
+		v.normal.Set(height * cos(Math::DegreeToRadian(theta)), radius, height * sin(Math::DegreeToRadian(theta)));
+		v.normal.Normalize();
+		v.color = color;
 		vertex_buffer_data.push_back(v);
 	}
 
 	for (unsigned slice = 0; slice < numSlice + 1; ++slice) {
-		float theta = slice * degree;
-		v.pos.Set(0, -0.5f * height, 0);
-		v.normal.Set(0, -1, 0);
-		vertex_buffer_data.push_back(v);
-		v.pos.Set(radius * cos(theta), 0, radius * sin(theta));
-		v.normal.Set(0, -1, 0);
-		vertex_buffer_data.push_back(v);
-	}
-
-	for (unsigned slice = 0; slice < numSlice + 1; ++slice) {
-		index_buffer_data.push_back(slice+1);
-		index_buffer_data.push_back(0);
+		index_buffer_data.push_back(coneStartIndex + 2 * slice + 0);
+		index_buffer_data.push_back(coneStartIndex + 2 * slice + 1);
 	}
 
 	Mesh* mesh = new Mesh(meshName);
@@ -350,12 +363,57 @@ Mesh* MeshBuilder::GenerateCircle(const std::string& meshName, Color color, unsi
 	v.normal.Set(0, 1, 0);
 	vertex_buffer_data.push_back(v);
 	v.color = color;
-	for (int i = 0; i < numSlice+1; ++i) {
+	for (unsigned i = 0; i < numSlice+1; ++i) {
 		float theta = i*degree;
 		v.pos.Set(radius*cos(theta), 0, radius*sin(theta)); 
 		vertex_buffer_data.push_back(v);
-		index_buffer_data.push_back(i + 1);
+	}
+	for (unsigned i = 0; i < numSlice + 1; ++i) {
 		index_buffer_data.push_back(0);
+		index_buffer_data.push_back(i+1);
+	}
+
+	Mesh* mesh = new Mesh(meshName);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, vertex_buffer_data.size() * sizeof(Vertex), &vertex_buffer_data[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_data.size() * sizeof(GLuint), &index_buffer_data[0], GL_STATIC_DRAW);
+
+	mesh->indexSize = index_buffer_data.size();
+	mesh->mode = Mesh::DRAW_TRIANGLE_STRIP;
+
+	return mesh;
+}
+
+Mesh* MeshBuilder::GenerateQuarterTorus(const std::string& meshName, Color color, unsigned numStack, unsigned numSlice, float outerR, float innerR) {
+	Vertex v;
+	std::vector<Vertex> vertex_buffer_data;
+	std::vector<GLuint> index_buffer_data;
+	v.color = color;
+
+	float degreePerStack = Math::HALF_PI / numStack;
+	float degreePerSlice = Math::TWO_PI / numSlice;
+	float x1, z1, x2, y2, z2;
+
+	for (unsigned stack = 0; stack < numStack + 1; ++stack) {
+		float phi = stack * degreePerStack;
+		z1 = outerR * cos(phi);
+		x1 = outerR * sin(phi);
+		for (unsigned slice = 0; slice < numSlice + 1; ++slice) {
+			float theta = slice * degreePerSlice;
+			z2 = (outerR + innerR * cos(theta)) * cos(phi);
+			y2 = innerR * sin(theta);
+			x2 = (outerR + innerR * cos(theta)) * sin(phi);
+			v.pos.Set(x2, y2, z2);
+			v.normal.Set(x2 - x1, y2, z2 - x1);
+			vertex_buffer_data.push_back(v);
+		}
+	}
+	for (unsigned stack = 0; stack < numStack; ++stack) {
+		for (unsigned slice = 0; slice < numSlice + 1; ++ slice) {
+			index_buffer_data.push_back((numSlice + 1) * stack + slice + 0);
+			index_buffer_data.push_back((numSlice + 1) * (stack + 1) + slice + 0);
+		}
 	}
 
 	Mesh* mesh = new Mesh(meshName);
