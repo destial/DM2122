@@ -23,6 +23,7 @@ public:
 	unsigned vertexBuffer;
 	unsigned indexBuffer;
 	unsigned indexSize;
+	unsigned textureID;
 };
 
 #endif

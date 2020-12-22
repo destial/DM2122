@@ -9,18 +9,18 @@ Mesh* MeshBuilder::GenerateAxes(const std::string &meshName, float lengthX, floa
 	std::vector<GLuint> index_buffer_data;
 	Vertex v;
 	v.color.Set(1.f, 0, 0);
-	v.pos.Set(lengthX, 0.f, 0.f); vertex_buffer_data.push_back(v);
 	v.pos.Set(-lengthX, 0.f, 0.f); vertex_buffer_data.push_back(v);
+	v.pos.Set(lengthX, 0.f, 0.f); vertex_buffer_data.push_back(v);
 
 	v.color.Set(0, 1.f, 0);
-	v.pos.Set(0.f, lengthY, 0.f); vertex_buffer_data.push_back(v);
 	v.pos.Set(0.f, -lengthY, 0.f); vertex_buffer_data.push_back(v);
+	v.pos.Set(0.f, lengthY, 0.f); vertex_buffer_data.push_back(v);
 
 	v.color.Set(0, 0, 1.f);
-	v.pos.Set(0.f, 0.f, lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(0.f, 0.f, -lengthZ); vertex_buffer_data.push_back(v);
+	v.pos.Set(0.f, 0.f, lengthZ); vertex_buffer_data.push_back(v);
 
-	for (unsigned i = 0; i < vertex_buffer_data.size(); i++) {
+	for (unsigned i = 0; i < 6; i++) {
 		index_buffer_data.push_back(i);
 	}
 
@@ -40,20 +40,24 @@ Mesh* MeshBuilder::GenerateQuad(const std::string &meshName, Color color, float 
 	std::vector<Vertex> vertex_buffer_data;
 	std::vector<GLuint> index_buffer_data;
 	v.color = color;
-	v.normal.Set(0, 0, 1.f);
+	v.normal.Set(0, 0, 1);
 
-	v.pos.Set(0.5f * lengthX, 0.5f * lengthY, 0.f);	
+	v.pos.Set(0.5f * lengthX, 0.5f * lengthY, 0.f); 
+	v.texCoord.Set(10, 10);
 	vertex_buffer_data.push_back(v);
 
 	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, 0.f); 
+	v.texCoord.Set(0, 10);
 	vertex_buffer_data.push_back(v);
 
-	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, 0.f); 
+	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, 0.f);
+	v.texCoord.Set(0, 0);
 	vertex_buffer_data.push_back(v);
 
-	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, 0.f); 
+	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, 0.f);
+	v.texCoord.Set(10, 0);
 	vertex_buffer_data.push_back(v);
-
+	
 	index_buffer_data.push_back(0);
 	index_buffer_data.push_back(1);
 	index_buffer_data.push_back(2);
@@ -80,6 +84,7 @@ Mesh* MeshBuilder::GenerateCube(const std::string &meshName, Color color, float 
 	std::vector<Vertex> vertex_buffer_data;
 	std::vector<GLuint> index_buffer_data;
 	v.color = color;
+	v.texCoord.Set(0, 0);
 	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, 0.5f * lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, 0.5f * lengthZ);	vertex_buffer_data.push_back(v);
@@ -87,6 +92,7 @@ Mesh* MeshBuilder::GenerateCube(const std::string &meshName, Color color, float 
 	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
 
+	v.texCoord.Set(1, 0);
 	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, 0.5f * lengthZ);	vertex_buffer_data.push_back(v);
 	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
@@ -94,6 +100,7 @@ Mesh* MeshBuilder::GenerateCube(const std::string &meshName, Color color, float 
 	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
 
+	v.texCoord.Set(1, 1);
 	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, 0.5f * lengthZ);	vertex_buffer_data.push_back(v);
 	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
@@ -101,6 +108,7 @@ Mesh* MeshBuilder::GenerateCube(const std::string &meshName, Color color, float 
 	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, 0.5f * lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
 
+	v.texCoord.Set(0, 1);
 	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, 0.5f * lengthZ);	vertex_buffer_data.push_back(v);
 	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, 0.5f * lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, 0.5f * lengthZ);	vertex_buffer_data.push_back(v);
@@ -108,6 +116,7 @@ Mesh* MeshBuilder::GenerateCube(const std::string &meshName, Color color, float 
 	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(0.5f * lengthX, 0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
 
+	v.texCoord.Set(0, 0);
 	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(0.5f * lengthX, 0.5f * lengthY, 0.5f * lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, 0.5f * lengthZ);	vertex_buffer_data.push_back(v);
@@ -115,6 +124,7 @@ Mesh* MeshBuilder::GenerateCube(const std::string &meshName, Color color, float 
 	v.pos.Set(0.5f * lengthX, 0.5f * lengthY, -0.5f * lengthZ);	vertex_buffer_data.push_back(v);
 	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
 
+	v.texCoord.Set(0, 1);
 	v.pos.Set(0.5f * lengthX, 0.5f * lengthY, 0.5f * lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, -0.5f * lengthZ); vertex_buffer_data.push_back(v);
 	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, 0.5f * lengthZ);	vertex_buffer_data.push_back(v);
@@ -156,19 +166,22 @@ Mesh* MeshBuilder::GenerateSphere(const std::string& meshName, Color color, unsi
 	v.color = color;
 	std::vector<Vertex> vertex_buffer_data;
 	std::vector<GLuint> index_buffer_data;
-
 	unsigned index = 0;
 	double pi = Math::PI;
 	double degreePerStack = pi / numStack;
 	double degreePerSlice = (2 * pi) / numSlice;
 	for (unsigned stack = 0; stack < numStack + 1; ++stack) {
 		double phi = -(pi / 2) + stack * degreePerStack;
+
 		for (unsigned slice = 0; slice < numSlice + 1; ++slice) {
 			double theta = slice * degreePerSlice;
+
 			v.pos.Set(radius * sphereX(phi, theta), radius * sphereY(phi, theta), radius * sphereZ(phi, theta));
+
+			v.texCoord.Set(slice/numSlice, stack/numStack);
+
 			v.normal.Set(sphereX(phi, theta), sphereY(phi, theta), sphereZ(phi, theta));
 			v.normal.Normalize();
-			v.color = color;
 			vertex_buffer_data.push_back(v);
 		}
 	}
@@ -353,8 +366,9 @@ Mesh* MeshBuilder::GenerateCone(const std::string& meshName, Color color, unsign
 	return mesh;
 }
 
-Mesh* MeshBuilder::GenerateCircle(const std::string& meshName, Color color, unsigned numSlice, float radius = 1.f) {
+Mesh* MeshBuilder::GenerateCircle(const std::string& meshName, Color color, unsigned numSlice, float radius) {
 	Vertex v;
+	v.color = color;
 	std::vector<Vertex> vertex_buffer_data;
 	std::vector<GLuint> index_buffer_data;
 
@@ -362,15 +376,16 @@ Mesh* MeshBuilder::GenerateCircle(const std::string& meshName, Color color, unsi
 	v.pos.Set(0, 0, 0);
 	v.normal.Set(0, 1, 0);
 	vertex_buffer_data.push_back(v);
-	v.color = color;
-	for (unsigned i = 0; i < numSlice+1; ++i) {
-		float theta = i*degree;
-		v.pos.Set(radius*cos(theta), 0, radius*sin(theta)); 
+	index_buffer_data.push_back(0);
+	for (unsigned i = 0; i < numSlice + 1; ++i) {
+		float theta = i * degree;
+		v.pos.Set(radius*cos(theta), 0, radius*sin(theta));
+		v.color = color;
 		vertex_buffer_data.push_back(v);
 	}
 	for (unsigned i = 0; i < numSlice + 1; ++i) {
+		index_buffer_data.push_back(i + 1);
 		index_buffer_data.push_back(0);
-		index_buffer_data.push_back(i+1);
 	}
 
 	Mesh* mesh = new Mesh(meshName);

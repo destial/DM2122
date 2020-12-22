@@ -61,11 +61,11 @@ private:
 	unsigned m_programID;
 	unsigned m_parameters[U_TOTAL];
 	Mesh* meshList[NUM_GEOMETRY];
-	bool lighton, reverse, hit;
+	bool lighton, reverse, hit, complete;
 	Light light[1];
 	MS modelStack, viewStack, projectionStack;
 	Camera camera;
-	Transform head, body, middle, leftarm, rightarm, nose, lefteye, righteye, hail;
+	Transform head, body, middle, leftarm, rightarm, nose, lefteye, righteye, hail, object;
 
 	Color RED = Color(1.f, 0.f, 0.f);
 	Color GREEN = Color(0.f, 1.f, 0.f);

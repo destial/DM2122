@@ -18,14 +18,14 @@ void Camera::Reset() {}
 
 void Camera::Update(double &dt) {
 	static const float SPEED = 30.f;
-	if (Application::IsKeyPressed('D')) {
+	if (Application::IsKeyPressed('A')) {
 		Vector3 view = (target - position).Normalized();
 		Vector3 right = view.Cross(up).Normalized();
 		Mtx44 rotation; rotation.SetToRotation(-(SPEED * dt), 0, 1, 0);
 		position = rotation * position;
 		up = rotation * up;
 	}
-	if (Application::IsKeyPressed('A')) {
+	if (Application::IsKeyPressed('D')) {
 		Vector3 view = (target - position).Normalized();
 		Vector3 right = view.Cross(up).Normalized();
 		Mtx44 rotation; rotation.SetToRotation((SPEED * dt), 0, 1, 0);
