@@ -43,11 +43,11 @@ Mesh* MeshBuilder::GenerateQuad(const std::string &meshName, Color color, float 
 	v.normal.Set(0, 0, 1);
 
 	v.pos.Set(0.5f * lengthX, 0.5f * lengthY, 0.f); 
-	v.texCoord.Set(10, 10);
+	v.texCoord.Set(1, 1);
 	vertex_buffer_data.push_back(v);
 
 	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, 0.f); 
-	v.texCoord.Set(0, 10);
+	v.texCoord.Set(0, 1);
 	vertex_buffer_data.push_back(v);
 
 	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, 0.f);
@@ -55,7 +55,7 @@ Mesh* MeshBuilder::GenerateQuad(const std::string &meshName, Color color, float 
 	vertex_buffer_data.push_back(v);
 
 	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, 0.f);
-	v.texCoord.Set(10, 0);
+	v.texCoord.Set(1, 0);
 	vertex_buffer_data.push_back(v);
 	
 	index_buffer_data.push_back(0);

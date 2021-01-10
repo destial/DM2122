@@ -1,7 +1,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <GL\glew.h>
 
 #include "LoadTGA.h"
 
@@ -64,4 +63,49 @@ GLuint LoadTGA(const char *file_path)				// load TGA file to memory
 	delete []data;
 
 	return texture;						
+}
+
+GLFWcursor* LoadCrosshair(const char* file_path) {
+	GLFWimage image;
+	std::ifstream fileStream(file_path, std::ios::binary);
+	if (!fileStream.is_open()) {
+		unsigned char pixels[1 * 1 * 1];
+		memset(pixels, 0xff, sizeof(pixels));
+		image.height = 1;
+		image.width = 1;
+		image.pixels = pixels;
+		return glfwCreateCursor(&image, 0, 0);;
+	}
+
+	GLubyte	header[18];									// first 6 useful header bytes
+	GLuint bytesPerPixel;								    // number of bytes per pixel in TGA gile
+	GLuint imageSize;									    // for setting memory
+	GLubyte* data;
+	unsigned width, height;
+
+	fileStream.read((char*)header, 18);
+	width = header[12] + header[13] * 256;
+	height = header[14] + header[15] * 256;
+
+	if (width <= 0 ||								// is width <= 0
+		height <= 0 ||								// is height <=0
+		(header[16] != 24 && header[16] != 32))		// is TGA 24 or 32 Bit
+	{
+		fileStream.close();							// close file on failure
+		std::cout << "File header error.\n";
+		return 0;
+	}
+
+	bytesPerPixel = header[16] / 8;						//divide by 8 to get bytes per pixel
+	imageSize = width * height * bytesPerPixel;	// calculate memory required for TGA data
+
+	data = new GLubyte[imageSize];
+	fileStream.seekg(18, std::ios::beg);
+	fileStream.read((char*)data, imageSize);
+	fileStream.close();
+
+	image.width = width;
+	image.height = height;
+	image.pixels = data;
+	return glfwCreateCursor(&image, width/2, height/2);
 }

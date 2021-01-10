@@ -441,9 +441,9 @@ void Mtx44::SetToLookAt(double eyeX, double eyeY, double eyeZ,
 	Vector3 u = s.Cross(f);
 
 	Mtx44 mat(s.x, u.x, -f.x, 0,
-		s.y, u.y, -f.y, 0,
-		s.z, u.z, -f.z, 0,
-		0, 0, 0, 1);
+			  s.y, u.y, -f.y, 0,
+			  s.z, u.z, -f.z, 0,
+			   0 ,  0 ,   0 , 1);
 	Mtx44 tran;
 	tran.SetToTranslation(-(float)eyeX, -(float)eyeY, -(float)eyeZ);
 	*this = mat * tran;

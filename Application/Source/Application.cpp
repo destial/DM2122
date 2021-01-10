@@ -9,7 +9,9 @@
 //Include the standard C++ headers
 #include <stdio.h>
 #include <stdlib.h>
+#include "LoadTGA.h"
 
+#include "Scene.h"
 #include "Scene1.h"
 #include "Scene2.h"
 #include "Scene4.h"
@@ -18,10 +20,15 @@
 #include "SceneLight2.h"
 #include "AssignmentScene.h"
 #include "Scene9.h"
+#include "SceneSkybox.h"
 
 GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
 const unsigned int frameTime = 1000 / FPS; // time for each frame
+Mouse mouse;
+const unsigned height = 900;
+const unsigned width = 1200;
+bool enableMouse = false;
 
 //Define an error callback
 static void error_callback(int error, const char* description) {
@@ -33,6 +40,33 @@ static void error_callback(int error, const char* description) {
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
+}
+
+static void mouse_callback(GLFWwindow* window, double x, double y) {
+	if (x < width / 2) {
+		mouse.left = true;
+		mouse.right = false;
+		mouse.x_diff = (width / 2) - x;
+	}
+	else if (x > width / 2) {
+		mouse.left = false;
+		mouse.right = true;
+		mouse.x_diff = x - (width / 2);
+	}
+	if (y < height / 2) {
+		mouse.up = false;
+		mouse.down = true;
+		mouse.y_diff = (height / 2) - y;
+	}
+	else if (y > height / 2) {
+		mouse.up = true;
+		mouse.down = false;
+		mouse.y_diff = y - (height / 2);
+	}
+}
+
+static void scroll_callback(GLFWwindow* window, double nan, double offSet) {
+	mouse.scroll = offSet;
 }
 
 void resize_callback(GLFWwindow* window, int w, int h) {
@@ -63,8 +97,12 @@ void Application::Init() {
 
 
 	//Create a window and create its OpenGL context
-	m_window = glfwCreateWindow(800, 600, "Week 6", NULL, NULL);
+	m_window = glfwCreateWindow(width, height, "Week 6", NULL, NULL);
 	glfwSetWindowSizeCallback(m_window, resize_callback);
+	glfwSetCursorPosCallback(m_window, mouse_callback);
+	glfwSetScrollCallback(m_window, scroll_callback);
+	GLFWcursor* cursor = LoadCrosshair("Image//crosshai.tga");
+	glfwSetCursor(m_window, cursor);
 
 	//If the window couldn't be created
 	if (!m_window) {
@@ -89,13 +127,14 @@ void Application::Init() {
 
 void Application::Run() {
 	//Main Loop
-	Scene *scene = new Scene9();
+	Scene *scene = new SceneSkybox();
 	scene->Init();
-
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
 	while (!glfwWindowShouldClose(m_window) && !IsKeyPressed(VK_ESCAPE)) {
-		scene->Update(m_timer.getElapsedTime());
+		scene->Update(m_timer.getElapsedTime(), mouse);
 		scene->Render();
+		mouse.reset();
+		glfwSetCursorPos(m_window, width / 2, height / 2);
 		//Swap buffers
 		glfwSwapBuffers(m_window);
 		//Get and organize events, like keyboard and mouse input, window resizing, etc...
