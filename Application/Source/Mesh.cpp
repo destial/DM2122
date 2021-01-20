@@ -19,8 +19,8 @@ void Mesh::Render() {
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
-	if (textureID > 0) 
-		glEnableVertexAttribArray(3);
+	if (textureID > 0) glEnableVertexAttribArray(3);
+
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
@@ -28,6 +28,7 @@ void Mesh::Render() {
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(Position) + sizeof(Color)));
 	if (textureID > 0) 
 		glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(Position) + sizeof(Color) + sizeof(Vector3)));
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 
 	switch (mode) {
@@ -38,7 +39,7 @@ void Mesh::Render() {
 		glDrawElements(GL_TRIANGLE_STRIP, indexSize, GL_UNSIGNED_INT, 0);
 		break;
 	case (DRAW_LINES):
-		glDrawElements(GL_LINES, indexSize, GL_UNSIGNED_INT, 0);;
+		glDrawElements(GL_LINES, indexSize, GL_UNSIGNED_INT, 0);
 		break;
 	case (DRAW_TRIANGLE_FAN):
 		glDrawElements(GL_TRIANGLE_FAN, indexSize, GL_UNSIGNED_INT, 0);

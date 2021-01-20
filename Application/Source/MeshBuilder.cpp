@@ -3,6 +3,7 @@
 #include <vector>
 #include "Vector3.h"
 #include "MyMath.h"
+#include "LoadOBJ.h"
 
 Mesh* MeshBuilder::GenerateAxes(const std::string &meshName, float lengthX, float lengthY, float lengthZ) {
 	std::vector<Vertex> vertex_buffer_data;
@@ -362,6 +363,32 @@ Mesh* MeshBuilder::GenerateCone(const std::string& meshName, Color color, unsign
 
 	mesh->indexSize = index_buffer_data.size();
 	mesh->mode = Mesh::DRAW_TRIANGLE_STRIP;
+
+	return mesh;
+}
+
+Mesh* MeshBuilder::GenerateOBJ(const std::string& meshName, const std::string& file_path) {
+	std::vector<Position> vertices;
+	std::vector<TexCoord> uvs;
+	std::vector<Vector3> normals;
+
+	bool success = LoadOBJ(file_path.c_str(), vertices, uvs, normals);
+	if (!success) {
+		return NULL;
+	}
+	std::vector<Vertex> vertex_buffer_data;
+	std::vector<unsigned> index_buffer_data;
+
+	IndexVBO(vertices, uvs, normals, index_buffer_data, vertex_buffer_data);
+
+	Mesh* mesh = new Mesh(meshName);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, vertex_buffer_data.size() * sizeof(Vertex), &vertex_buffer_data[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer_data.size() * sizeof(GLuint), &index_buffer_data[0], GL_STATIC_DRAW);
+
+	mesh->indexSize = index_buffer_data.size();
+	mesh->mode = Mesh::DRAW_TRIANGLES;
 
 	return mesh;
 }

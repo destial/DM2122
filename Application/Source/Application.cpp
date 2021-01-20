@@ -21,6 +21,7 @@
 #include "AssignmentScene.h"
 #include "Scene9.h"
 #include "SceneSkybox.h"
+#include "SceneModel.h"
 
 GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
@@ -28,7 +29,8 @@ const unsigned int frameTime = 1000 / FPS; // time for each frame
 Mouse mouse;
 const unsigned height = 900;
 const unsigned width = 1200;
-bool enableMouse = false;
+bool enableMouse = true;
+GLFWcursor* cursor;
 
 //Define an error callback
 static void error_callback(int error, const char* description) {
@@ -99,11 +101,7 @@ void Application::Init() {
 	//Create a window and create its OpenGL context
 	m_window = glfwCreateWindow(width, height, "Week 6", NULL, NULL);
 	glfwSetWindowSizeCallback(m_window, resize_callback);
-	glfwSetCursorPosCallback(m_window, mouse_callback);
-	glfwSetScrollCallback(m_window, scroll_callback);
-	GLFWcursor* cursor = LoadCrosshair("Image//crosshai.tga");
-	glfwSetCursor(m_window, cursor);
-
+	cursor = LoadCrosshair("Image//crosshai.tga");
 	//If the window couldn't be created
 	if (!m_window) {
 		fprintf( stderr, "Failed to open GLFW window.\n" );
@@ -127,14 +125,33 @@ void Application::Init() {
 
 void Application::Run() {
 	//Main Loop
-	Scene *scene = new SceneSkybox();
+	Scene *scene = new SceneModel();
 	scene->Init();
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
 	while (!glfwWindowShouldClose(m_window) && !IsKeyPressed(VK_ESCAPE)) {
 		scene->Update(m_timer.getElapsedTime(), mouse);
 		scene->Render();
-		mouse.reset();
-		glfwSetCursorPos(m_window, width / 2, height / 2);
+		if (Application::IsKeyPressed('F')) {
+			glfwSetCursorPosCallback(m_window, mouse_callback);
+			glfwSetScrollCallback(m_window, scroll_callback);
+			glfwSetCursor(m_window, cursor);
+			enableMouse = true;
+		}
+		if (Application::IsKeyPressed('G')) {
+			enableMouse = false;
+		}
+		if (enableMouse) {
+			glfwSetCursorPosCallback(m_window, mouse_callback);
+			glfwSetScrollCallback(m_window, scroll_callback);
+			glfwSetCursor(m_window, cursor);
+			mouse.reset();
+			glfwSetCursorPos(m_window, width / 2, height / 2);
+		}
+		else {
+			glfwSetCursorPosCallback(m_window, NULL);
+			glfwSetScrollCallback(m_window, NULL);
+			glfwSetCursor(m_window, NULL);
+		}
 		//Swap buffers
 		glfwSwapBuffers(m_window);
 		//Get and organize events, like keyboard and mouse input, window resizing, etc...

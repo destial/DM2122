@@ -92,7 +92,7 @@ void SceneSkybox::Init() {
 	bounds = 300.f;
 	projection.SetToPerspective(45.0f, 40.0f / 30.0f, 0.1f, bounds);
 	projectionStack.LoadMatrix(projection);
-	camera.Init(Vector3(1, 0, 1), Vector3(0, 0, 0), Vector3(1, 1, 1));
+	camera.Init(Vector3(0, 0, 0), Vector3(1, 0, 1), Vector3(0, 1, 0));
 
 	Reset();
 

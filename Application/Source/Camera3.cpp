@@ -18,39 +18,36 @@ void Camera3::Reset() {}
 
 void Camera3::Update(double &dt, Mouse& mouse) {
 	const float SENSITIVITY = 4.f * dt;
-	//const float SPEED = SENSITIVITY / 20.f;
 	Vector3 view = (target - position).Normalized();
 	Vector3 right = view.Cross(up).Normalized();
 	if (mouse.left) {
 		Mtx44 rotation;
 		rotation.SetToRotation((float)(mouse.x_diff * SENSITIVITY), up.x, up.y, up.z);
-		view = rotation * view;
+		view = (rotation * view).Normalized();
 		target = position + view;
 	}
 	else if (mouse.right) {
 		Mtx44 rotation;
 		rotation.SetToRotation((float)(-mouse.x_diff * SENSITIVITY), up.x, up.y, up.z);
-		view = rotation * view;
+		view = (rotation * view).Normalized();
 		target = position + view;
 	}
-
-	view = (target - position).Normalized();
-	right = view.Cross(up).Normalized();
 	if (mouse.up) {
 		Mtx44 rotation;
 		rotation.SetToRotation((float)(-mouse.y_diff * SENSITIVITY), right.x, right.y, right.z);
-		view = rotation * view;
+		view = (rotation * view).Normalized();
 		target = position + view;
 	}
 	else if (mouse.down) {
 		Mtx44 rotation;
 		rotation.SetToRotation((float)(mouse.y_diff * SENSITIVITY), right.x, right.y, right.z);
-		view = rotation * view;
+		view = (rotation * view).Normalized();
 		target = position + view;
 	}
 	//view = (target - position).Normalized();
 	//right = view.Cross(up).Normalized();
-	position += view * mouse.scroll * SENSITIVITY;
+	//if (position != target)
+	//	position += view * mouse.scroll * SENSITIVITY;
 
 	if (Application::IsKeyPressed('W')) {
 		position += view * SENSITIVITY;
