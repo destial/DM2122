@@ -72,22 +72,50 @@ void Mesh::Render(unsigned offset, unsigned count) {
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 
-	switch (mode) {
-	case (DRAW_TRIANGLES):
-		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
-		break;
-	case (DRAW_TRIANGLE_STRIP):
-		glDrawElements(GL_TRIANGLE_STRIP, count, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
-		break;
-	case (DRAW_LINES):
-		glDrawElements(GL_LINES, count, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
-		break;
-	case (DRAW_TRIANGLE_FAN):
-		glDrawElements(GL_TRIANGLE_FAN, count, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
-		break;
-	default:
-		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
-		break;
+	if (materials.size() == 0) {
+		switch (mode) {
+		case (DRAW_TRIANGLES):
+			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
+			break;
+		case (DRAW_TRIANGLE_STRIP):
+			glDrawElements(GL_TRIANGLE_STRIP, count, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
+			break;
+		case (DRAW_LINES):
+			glDrawElements(GL_LINES, count, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
+			break;
+		case (DRAW_TRIANGLE_FAN):
+			glDrawElements(GL_TRIANGLE_FAN, count, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
+			break;
+		default:
+			glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
+			break;
+		}
+	} else {
+		for (unsigned i = 0, offset = 0; i < materials.size(); ++i) {
+			Material& material = materials[i];
+			glUniform3fv(locationKa, 1, &material.kAmbient.r);
+			glUniform3fv(locationKd, 1, &material.kDiffuse.r);
+			glUniform3fv(locationKs, 1, &material.kSpecular.r);
+			glUniform1f(locationNs, material.kShininess);
+			switch (mode) {
+			case (DRAW_TRIANGLES):
+				glDrawElements(GL_TRIANGLES, material.size, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
+				break;
+			case (DRAW_TRIANGLE_STRIP):
+				glDrawElements(GL_TRIANGLE_STRIP, material.size, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
+				break;
+			case (DRAW_LINES):
+				glDrawElements(GL_LINES, material.size, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
+				break;
+			case (DRAW_TRIANGLE_FAN):
+				glDrawElements(GL_TRIANGLE_FAN, material.size, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
+				break;
+			default:
+				glDrawElements(GL_TRIANGLES, material.size, GL_UNSIGNED_INT, (void*)(offset * sizeof(GLuint)));
+				break;
+			}
+			offset += material.size;
+		}
 	}
 
 	glDisableVertexAttribArray(0);
@@ -95,4 +123,16 @@ void Mesh::Render(unsigned offset, unsigned count) {
 	glDisableVertexAttribArray(2);
 	if (textureID > 0)
 		glDisableVertexAttribArray(3);
+}
+
+unsigned Mesh::locationKa;
+unsigned Mesh::locationKd;
+unsigned Mesh::locationKs;
+unsigned Mesh::locationNs;
+
+void Mesh::SetMaterialLoc(unsigned kA, unsigned kD, unsigned kS, unsigned nS) {
+	locationKa = kA;
+	locationKd = kD;
+	locationKs = kS;
+	locationNs = nS;
 }

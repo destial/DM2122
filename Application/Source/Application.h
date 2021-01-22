@@ -1,8 +1,8 @@
-
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
 #include "timer.h"
+#include <set>
 
 struct Mouse {
 	Mouse() {
@@ -30,6 +30,7 @@ public:
 	void Run();
 	void Exit();
 	static bool IsKeyPressed(unsigned short key);
+	static bool IsKeyPressedOnce(unsigned short key);
 private:
 	//Declare a window object
 	StopWatch m_timer;

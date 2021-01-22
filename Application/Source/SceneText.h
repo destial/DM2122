@@ -21,6 +21,7 @@ class SceneText : public Scene {
 		GEO_SPHERE2,
 		GEO_LIGHT,
 		GEO_QUAD,
+		GEO_CROSSHAIR,
 		GEO_CIRCLE,
 		GEO_CYL,
 		GEO_CONE,
@@ -100,6 +101,7 @@ private:
 	void RenderMesh(Mesh* mesh, bool enableLight);
 	void RenderText(Mesh* mesh, std::string text, Color color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
+	void RenderImageOnScreen(Mesh* mesh, float size, float x, float y);
 	void RenderSkybox();
 	void Reset();
 public:

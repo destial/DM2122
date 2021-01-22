@@ -4,5 +4,4 @@
 #include <GLFW\glfw3.h>
 
 GLuint LoadTGA(const char *file_path);
-GLFWcursor* LoadCrosshair(const char* file_path);
 #endif

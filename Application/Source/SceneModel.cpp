@@ -59,6 +59,7 @@ void SceneModel::Init() {
 	glUniform1f(m_parameters[U_LIGHT0_COSINNER], light[0].cosInner);
 	glUniform1f(m_parameters[U_LIGHT0_EXPONENT], light[0].exponent);
 	glUniform1i(m_parameters[U_NUMLIGHTS], 1);
+	Mesh::SetMaterialLoc(m_parameters[U_MATERIAL_AMBIENT], m_parameters[U_MATERIAL_DIFFUSE], m_parameters[U_MATERIAL_SPECULAR], m_parameters[U_MATERIAL_SHININESS]);
 	
 	glGenVertexArrays(1, &m_vertexArrayID);
 	glBindVertexArray(m_vertexArrayID);
@@ -103,6 +104,11 @@ void SceneModel::Init() {
 
 	meshList[GEO_MODEL6] = MeshBuilder::GenerateOBJ("winebottle", "OBJ//winebottle.obj");
 	meshList[GEO_MODEL6]->textureID = LoadTGA("Image//winebottle.tga");
+
+	meshList[GEO_MODEL7] = MeshBuilder::GenerateOBJMTL("house", "OBJ//house_type01.obj", "OBJ//house_type01.mtl");
+
+	meshList[GEO_MODEL8] = MeshBuilder::GenerateOBJMTL("cottage", "OBJ//cottage_obj.obj", "OBJ//cottage_obj.mtl");
+	meshList[GEO_MODEL8]->textureID = LoadTGA("Image//cottage_diffuse.tga");
 
 	Mtx44 projection; 
 	bounds = 300.f;
@@ -168,6 +174,8 @@ void SceneModel::Update(double dt, Mouse mouse) {
 	light[0].position.y = camera.position.y;
 	light[0].position.z = camera.position.z;
 	camera.Update(dt, mouse);
+
+	Render();
 }
 
 void SceneModel::RenderMesh(Mesh* mesh, bool enableLight) {
@@ -305,6 +313,16 @@ void SceneModel::Render() {
 	modelStack.PushMatrix();
 	RenderMesh(meshList[GEO_MODEL6], true);
 	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	RenderMesh(meshList[GEO_MODEL7], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+
+	/*modelStack.Scale(0.5, 0.5, 0.5);
+	RenderMesh(meshList[GEO_MODEL8], true);
+	modelStack.PopMatrix();*/
 
 	modelStack.PushMatrix();
 	modelStack.Translate(0, 8, 0);

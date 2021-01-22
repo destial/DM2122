@@ -89,6 +89,9 @@ void SceneText::Init() {
 	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("quad", WHITE, 1.f, 1.f);
 	meshList[GEO_QUAD]->textureID = LoadTGA("Image//pogchamp.tga");
 
+	meshList[GEO_CROSSHAIR] = MeshBuilder::GenerateQuad("crosshair", WHITE, 1.f, 1.f);
+	meshList[GEO_CROSSHAIR]->textureID = LoadTGA("Image//crosshair.tga");
+
 	meshList[GEO_MODEL1] = MeshBuilder::GenerateOBJ("chair", "OBJ//chair.obj");
 	meshList[GEO_MODEL1]->textureID = LoadTGA("Image//chair.tga");
 
@@ -182,6 +185,10 @@ void SceneText::Update(double dt, Mouse mouse) {
 	modelStack.PushMatrix();
 	RenderTextOnScreen(meshList[GEO_TEXT], ("FPS: " + fpsString), Color(0, 1, 0), 4, 0, 14);
 	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	RenderImageOnScreen(meshList[GEO_CROSSHAIR], 4, 10, 7.5);
+	modelStack.PopMatrix();
 }
 
 void SceneText::RenderMesh(Mesh* mesh, bool enableLight) {
@@ -273,6 +280,39 @@ void SceneText::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, fl
 
 		mesh->Render((unsigned)text[i] * 6, 6);
 	}
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glUniform1i(m_parameters[U_TEXT_ENABLED], 0);
+	projectionStack.PopMatrix();
+	viewStack.PopMatrix();
+	modelStack.PopMatrix();
+	glEnable(GL_DEPTH_TEST);
+}
+
+void SceneText::RenderImageOnScreen(Mesh* mesh, float size, float x, float y) {
+	if (!mesh || mesh->textureID <= 0) //Proper error check
+		return;
+
+	glDisable(GL_DEPTH_TEST);
+	Mtx44 ortho;
+	ortho.SetToOrtho(0, 80, 0, 60, -10, 10); //size of screen UI
+	projectionStack.PushMatrix();
+	projectionStack.LoadMatrix(ortho);
+	viewStack.PushMatrix();
+	viewStack.LoadIdentity(); //No need camera for ortho mode
+	modelStack.PushMatrix();
+	modelStack.LoadIdentity(); //Reset modelStack
+	modelStack.Scale(size, size, size);
+	modelStack.Translate(x, y, 0);
+
+	glUniform1i(m_parameters[U_TEXT_ENABLED], 1);
+	glUniform1i(m_parameters[U_LIGHTENABLED], 0);
+	glUniform1i(m_parameters[U_COLOR_TEXTURE_ENABLED], 1);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, mesh->textureID);
+	glUniform1i(m_parameters[U_COLOR_TEXTURE], 0);
+	Mtx44 MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top();
+	glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
+	mesh->Render();
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glUniform1i(m_parameters[U_TEXT_ENABLED], 0);
 	projectionStack.PopMatrix();

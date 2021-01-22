@@ -28,10 +28,10 @@ GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
 const unsigned int frameTime = 1000 / FPS; // time for each frame
 Mouse mouse;
-const unsigned height = 900;
-const unsigned width = 1200;
+unsigned height = 900;
+unsigned width = 1200;
 bool enableMouse = true;
-GLFWcursor* cursor;
+std::set<unsigned short> activeKeys;
 
 //Define an error callback
 static void error_callback(int error, const char* description) {
@@ -74,10 +74,24 @@ static void scroll_callback(GLFWwindow* window, double nan, double offSet) {
 
 void resize_callback(GLFWwindow* window, int w, int h) {
 	glViewport(0, 0, w, h);
+	width = w;
+	height = h;
 }
 
 bool Application::IsKeyPressed(unsigned short key) {
     return ((GetAsyncKeyState(key) & 0x8001) != 0);
+}
+
+bool Application::IsKeyPressedOnce(unsigned short key) {
+	std::pair<std::set<unsigned short>::iterator, bool> ret;
+	if ((GetAsyncKeyState(key) & 0x8001) != 0) {
+		ret = activeKeys.insert(key);
+		if (!ret.second) 
+			return false;
+		else 
+			return true;
+	} else 
+		activeKeys.erase(key);
 }
 
 Application::Application() {}
@@ -102,7 +116,7 @@ void Application::Init() {
 	//Create a window and create its OpenGL context
 	m_window = glfwCreateWindow(width, height, "COMG", NULL, NULL);
 	glfwSetWindowSizeCallback(m_window, resize_callback);
-	cursor = LoadCrosshair("Image//crosshai.tga");
+	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	//If the window couldn't be created
 	if (!m_window) {
 		fprintf( stderr, "Failed to open GLFW window.\n" );
@@ -132,27 +146,24 @@ void Application::Run() {
 	while (!glfwWindowShouldClose(m_window) && !IsKeyPressed(VK_ESCAPE)) {
 		scene->Update(m_timer.getElapsedTime(), mouse);
 		//scene->Render();
-		if (Application::IsKeyPressed('T')) {
+		if (Application::IsKeyPressedOnce('T')) {
 			if (!enableMouse) {
 				glfwSetCursorPosCallback(m_window, mouse_callback);
 				glfwSetScrollCallback(m_window, scroll_callback);
-				glfwSetCursor(m_window, cursor);
 				enableMouse = true;
-			} else if (enableMouse) {
+			} else {
 				enableMouse = false;
 			}
 		}
 		if (enableMouse) {
 			glfwSetCursorPosCallback(m_window, mouse_callback);
 			glfwSetScrollCallback(m_window, scroll_callback);
-			glfwSetCursor(m_window, cursor);
 			mouse.reset();
 			glfwSetCursorPos(m_window, width / 2, height / 2);
 		}
 		else {
 			glfwSetCursorPosCallback(m_window, NULL);
 			glfwSetScrollCallback(m_window, NULL);
-			glfwSetCursor(m_window, NULL);
 			mouse.reset();
 		}
 		//Swap buffers
