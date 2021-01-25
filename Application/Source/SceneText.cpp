@@ -113,11 +113,16 @@ void SceneText::Init() {
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Image//calibri.tga");
 
-	Mtx44 projection; 
+	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("pointer", WHITE, 30, 30, 1.f);
+
 	bounds = 300.f;
-	projection.SetToPerspective(45.0f, 40.0f / 30.0f, 0.1f, bounds);
+	float fov = 45.f;
+
+	camera.Init(Vector3(1, 0, 1), Vector3(0, 0, 0), Vector3(0, 1, 0), fov);
+
+	Mtx44 projection;
+	projection.SetToPerspective(fov, 40.0f / 30.0f, 0.1f, bounds);
 	projectionStack.LoadMatrix(projection);
-	camera.Init(Vector3(0, 0, 0), Vector3(1, 0, 1), Vector3(0, 1, 0));
 
 	Reset();
 
@@ -134,6 +139,7 @@ void SceneText::Update(double dt) {
 }
 
 void SceneText::Update(double dt, Mouse mouse) {
+	float fps = (1.f / dt);
 	if (Application::IsKeyPressed('1')) {
 		glEnable(GL_CULL_FACE);
 	}
@@ -177,10 +183,12 @@ void SceneText::Update(double dt, Mouse mouse) {
 	light[0].position.y = camera.position.y;
 	light[0].position.z = camera.position.z;
 	camera.Update(dt, mouse);
+	Mtx44 projection;
+	projection.SetToPerspective(camera.fov, 40.0f / 30.0f, 0.1f, bounds);
+	projectionStack.LoadMatrix(projection);
 
 	Render();
 
-	float fps = (1.f / dt);
 	std::string fpsString = std::to_string(fps).substr(0, std::to_string(fps).find('.') + 4);
 	modelStack.PushMatrix();
 	RenderTextOnScreen(meshList[GEO_TEXT], ("FPS: " + fpsString), Color(0, 1, 0), 4, 0, 14);
@@ -327,14 +335,15 @@ void SceneText::RenderSkybox() {
 	modelStack.PushMatrix();
 	modelStack.Translate(0, translate, 0);
 	modelStack.Rotate(90, 1, 0, 0);
-	modelStack.Rotate(90, 0, 0, 1);
+	modelStack.Rotate(270, 0, 0, 1);
 	modelStack.Scale(scaleVal, scaleVal, scaleVal);
 	RenderMesh(meshList[GEO_TOP], false);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(0, -translate, 0);
-	modelStack.Rotate(90, 1, 0, 0);
+	modelStack.Rotate(-90, 1, 0, 0);
+	modelStack.Rotate(90, 0, 0, 1);
 	modelStack.Scale(scaleVal, scaleVal, scaleVal);
 	RenderMesh(meshList[GEO_BOTTOM], false);
 	modelStack.PopMatrix();
@@ -400,7 +409,7 @@ void SceneText::Render() {
 
 	RenderSkybox();
 
-	/*modelStack.PushMatrix();
+	modelStack.PushMatrix();
 	RenderMesh(meshList[GEO_MODEL1], true);
 	modelStack.PopMatrix();
 
@@ -422,7 +431,7 @@ void SceneText::Render() {
 
 	modelStack.PushMatrix();
 	RenderMesh(meshList[GEO_MODEL6], true);
-	modelStack.PopMatrix();*/
+	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
 	modelStack.Translate(0, 8, 0);
@@ -431,13 +440,17 @@ void SceneText::Render() {
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	//scale, translate, rotate
 	RenderText(meshList[GEO_TEXT], "Hello World", BLUE);
 	modelStack.PopMatrix();
 	
 	modelStack.PushMatrix();
 	RenderTextOnScreen(meshList[GEO_TEXT], "Hello Screen", RED, 4, 0, 0);
 	modelStack.PopMatrix();
+
+	/*modelStack.PushMatrix();
+	modelStack.Translate(camera.target.x, camera.target.y, camera.target.z);
+	RenderMesh(meshList[GEO_SPHERE], false);
+	modelStack.PopMatrix();*/
 }
 
 void SceneText::Exit() {
@@ -448,4 +461,5 @@ void SceneText::Exit() {
 }
 
 void SceneText::Reset() {
+	camera.Reset();
 }
