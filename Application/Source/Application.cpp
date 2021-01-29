@@ -58,13 +58,13 @@ static void mouse_callback(GLFWwindow* window, double x, double y) {
 		mouse.x_diff = x - (width / 2);
 	}
 	if (y < height / 2) {
-		mouse.up = false;
-		mouse.down = true;
+		mouse.up = true;
+		mouse.down = false;
 		mouse.y_diff = (height / 2) - y;
 	}
 	else if (y > height / 2) {
-		mouse.up = true;
-		mouse.down = false;
+		mouse.up = false;
+		mouse.down = true;
 		mouse.y_diff = y - (height / 2);
 	}
 }
