@@ -37,6 +37,8 @@ void AssignmentScene2::Init() {
 
 	m_parameters[U_TEXT_ENABLED] = glGetUniformLocation(m_programID, "textEnabled");
 	m_parameters[U_TEXT_COLOR] = glGetUniformLocation(m_programID, "textColor");
+
+	Mesh::SetMaterialLoc(m_parameters[U_MATERIAL_AMBIENT], m_parameters[U_MATERIAL_DIFFUSE], m_parameters[U_MATERIAL_SPECULAR], m_parameters[U_MATERIAL_SHININESS]);
 	glUseProgram(m_programID);
 
 	light[0].type = Light::LIGHT_SPOT;
@@ -66,8 +68,6 @@ void AssignmentScene2::Init() {
 	glGenVertexArrays(1, &m_vertexArrayID);
 	glBindVertexArray(m_vertexArrayID);
 
-	meshList[GEO_AXES] = MeshBuilder::GenerateAxes("reference", 100.f, 100.f, 100.f);
-
 	meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("front", WHITE, 1.f, 1.f);
 	meshList[GEO_FRONT]->textureID = LoadTGA("Image//front-space.tga");
 
@@ -89,11 +89,18 @@ void AssignmentScene2::Init() {
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Image//calibri.tga");
 
-	Mtx44 projection; 
+	meshList[GEO_QUAD] = MeshBuilder::GenerateGround("ground", WHITE, 1.f, 1.f);
+	meshList[GEO_QUAD]->textureID = LoadTGA("Image//concrete.tga");
+
+	meshList[GEO_MODEL1] = MeshBuilder::GenerateOBJMTL("cottage", "OBJ//cottage_obj.obj", "OBJ//cottage_obj.mtl");
+	meshList[GEO_MODEL1]->textureID = LoadTGA("Image//cottage_diffuse.tga");
+
+
 	bounds = 300.f;
+	Mtx44 projection;
 	projection.SetToPerspective(45.0f, 40.0f / 30.0f, 0.1f, bounds);
 	projectionStack.LoadMatrix(projection);
-	camera.Init(Vector3(0, 0, 0), Vector3(1, 0, 1), Vector3(0, 1, 0));
+	camera.Init(Vector3(0, 0.4, 0), Vector3(1, 0.5, 1), Vector3(0, 1, 0), float(45.0f));
 
 	Reset();
 
@@ -153,6 +160,9 @@ void AssignmentScene2::Update(double dt, Mouse mouse) {
 	light[0].position.y = camera.position.y;
 	light[0].position.z = camera.position.z;
 	camera.Update(dt, mouse);
+	Mtx44 projection;
+	projection.SetToPerspective(camera.fov, 40.0f / 30.0f, 0.1f, bounds);
+	projectionStack.LoadMatrix(projection);
 
 	Render();
 
@@ -341,6 +351,13 @@ void AssignmentScene2::RenderSkybox() {
 	modelStack.Scale(scaleVal, scaleVal, scaleVal);
 	RenderMesh(meshList[GEO_LEFT], false);
 	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	//modelStack.Translate(0, -1, 0);
+	modelStack.Scale(scaleVal, scaleVal, scaleVal);
+	modelStack.Rotate(90, 1, 0, 0);
+	RenderMesh(meshList[GEO_QUAD], true);
+	modelStack.PopMatrix();
 }
 
 void AssignmentScene2::Render() {
@@ -370,19 +387,11 @@ void AssignmentScene2::Render() {
 		glUniform3fv(m_parameters[U_LIGHT0_POSITION], 1, &lightPosition_cameraspace.x);
 	}
 
-	modelStack.PushMatrix();
-	RenderMesh(meshList[GEO_AXES], false);
-	modelStack.PopMatrix();
-
 	RenderSkybox();
 
 	modelStack.PushMatrix();
-	//scale, translate, rotate
-	RenderText(meshList[GEO_TEXT], "Hello World", BLUE);
-	modelStack.PopMatrix();
-	
-	modelStack.PushMatrix();
-	RenderTextOnScreen(meshList[GEO_TEXT], "Hello Screen", RED, 4, 0, 0);
+	modelStack.Scale(0.1, 0.1, 0.1);
+	RenderMesh(meshList[GEO_MODEL1], true);
 	modelStack.PopMatrix();
 }
 

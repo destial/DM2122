@@ -236,7 +236,7 @@ void SceneText::RenderText(Mesh* mesh, std::string text, Color color) {
 	if (!mesh || mesh->textureID <= 0) //Proper error check
 		return;
 
-	glDisable(GL_DEPTH_TEST);
+	//glDisable(GL_DEPTH_TEST);
 	glUniform1i(m_parameters[U_TEXT_ENABLED], 1);
 	glUniform3fv(m_parameters[U_TEXT_COLOR], 1, &color.r);
 	glUniform1i(m_parameters[U_LIGHTENABLED], 0);
@@ -254,7 +254,7 @@ void SceneText::RenderText(Mesh* mesh, std::string text, Color color) {
 	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glUniform1i(m_parameters[U_TEXT_ENABLED], 0);
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST);
 }
 
 void SceneText::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y) {
@@ -270,8 +270,8 @@ void SceneText::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, fl
 	viewStack.LoadIdentity(); //No need camera for ortho mode
 	modelStack.PushMatrix();
 	modelStack.LoadIdentity(); //Reset modelStack
-	modelStack.Scale(size, size, size);
 	modelStack.Translate(x, y, 0);
+	modelStack.Scale(size, size, size);
 
 	glUniform1i(m_parameters[U_TEXT_ENABLED], 1);
 	glUniform3fv(m_parameters[U_TEXT_COLOR], 1, &color.r);
@@ -309,8 +309,8 @@ void SceneText::RenderImageOnScreen(Mesh* mesh, float size, float x, float y) {
 	viewStack.LoadIdentity(); //No need camera for ortho mode
 	modelStack.PushMatrix();
 	modelStack.LoadIdentity(); //Reset modelStack
-	modelStack.Scale(size, size, size);
 	modelStack.Translate(x, y, 0);
+	modelStack.Scale(size, size, size);
 
 	glUniform1i(m_parameters[U_TEXT_ENABLED], 1);
 	glUniform1i(m_parameters[U_LIGHTENABLED], 0);

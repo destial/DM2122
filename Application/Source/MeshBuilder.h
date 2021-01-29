@@ -29,6 +29,8 @@ public:
 	static Mesh* GenerateOBJMTL(const std::string& meshName, const std::string& obj_path, const std::string& mtl_path);
 
 	static Mesh* GenerateText(const std::string& meshName, unsigned numRow, unsigned numCol);
+
+	static Mesh* GenerateGround(const std::string& meshName, Color color, float lengthX, float lengthY);
 };
 
 #endif

@@ -8,6 +8,7 @@ struct Component {
 	}
 	Component& operator=(const Component& rhs) {
 		Set(rhs.r, rhs.g, rhs.b);
+		return *this;
 	}
 	void Set(float r, float g, float b) {
 		this->r = r; this->g = g; this->b = b;
@@ -19,13 +20,13 @@ struct Material {
 	Component kDiffuse;
 	Component kSpecular;
 	float kShininess;
-	float size;
+	unsigned size;
 	Material() {
 		this->kAmbient.Set(1.f, 1.f, 1.f);
 		this->kAmbient.Set(1.f, 1.f, 1.f);
 		this->kSpecular.Set(1.f, 1.f, 1.f);
 		this->kShininess = 1.f;
-		this->size = 1.f;
+		this->size = 0;
 	}
 	Material& operator=(const Material& rhs) {
 		kAmbient = rhs.kAmbient;
@@ -33,6 +34,7 @@ struct Material {
 		kSpecular = rhs.kSpecular;
 		kShininess = rhs.kShininess;
 		size = rhs.size;
+		return *this;
 	}
 };
 

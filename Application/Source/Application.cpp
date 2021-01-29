@@ -1,6 +1,4 @@
 #include "Application.h"
-
-//Include GLEW
 #include <GL/glew.h>
 
 //Include GLFW
@@ -24,15 +22,19 @@
 #include "SceneModel.h"
 #include "SceneText.h"
 #include "AssignmentScene2.h"
+#include "SceneUI.h"
 
-GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
 const unsigned int frameTime = 1000 / FPS; // time for each frame
 Mouse mouse;
-unsigned height = 900;
-unsigned width = 1200;
-bool enableMouse = true;
-std::set<unsigned short> activeKeys;
+bool enableMouse;
+std::set<unsigned short> Application::activeKeys;
+unsigned Application::m_width;
+unsigned Application::m_height;
+unsigned Application::ui_width;
+unsigned Application::ui_height;
+int Application::state;
+GLFWwindow *m_window;
 
 //Define an error callback
 static void error_callback(int error, const char* description) {
@@ -47,25 +49,25 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 }
 
 static void mouse_callback(GLFWwindow* window, double x, double y) {
-	if (x < width / 2) {
+	if (x < Application::m_width / 2) {
 		mouse.left = true;
 		mouse.right = false;
-		mouse.x_diff = (width / 2) - x;
+		mouse.x_diff = (Application::m_width / 2) - x;
 	}
-	else if (x > width / 2) {
+	else if (x > Application::m_width / 2) {
 		mouse.left = false;
 		mouse.right = true;
-		mouse.x_diff = x - (width / 2);
+		mouse.x_diff = x - (Application::m_width / 2);
 	}
-	if (y < height / 2) {
+	if (y < Application::m_height / 2) {
 		mouse.up = true;
 		mouse.down = false;
-		mouse.y_diff = (height / 2) - y;
+		mouse.y_diff = (Application::m_height / 2) - y;
 	}
-	else if (y > height / 2) {
+	else if (y > Application::m_height / 2) {
 		mouse.up = false;
 		mouse.down = true;
-		mouse.y_diff = y - (height / 2);
+		mouse.y_diff = y - (Application::m_height / 2);
 	}
 }
 
@@ -75,12 +77,74 @@ static void scroll_callback(GLFWwindow* window, double nan, double offSet) {
 
 void resize_callback(GLFWwindow* window, int w, int h) {
 	glViewport(0, 0, w, h);
-	width = w;
-	height = h;
+	Application::m_width = w;
+	Application::m_height = h;
+	Application::ui_width = 80;
+	Application::ui_height = 60;
 }
 
 bool Application::IsKeyPressed(unsigned short key) {
     return ((GetAsyncKeyState(key) & 0x8001) != 0);
+}
+
+bool Application::IsMousePressed(unsigned short key) {
+	if (glfwGetMouseButton(m_window, key) != 0) {
+		if (key == 0) {
+			mouse.rightclick = false;
+			mouse.leftclick = true;
+		} else if (key == 1) {
+			mouse.leftclick = false;
+			mouse.rightclick = true;
+		}
+		return true;
+	}
+	return false;
+}
+
+bool Application::IsMousePressedOnce(unsigned short key) {
+	std::pair<std::set<unsigned short>::iterator, bool> ret;
+	if (glfwGetMouseButton(m_window, key) != 0) {
+		ret = activeKeys.insert(key);
+		if (!ret.second) {
+			return false;
+		} else {
+			if (key == 0) {
+				mouse.rightclick = false;
+				mouse.leftclick = true;
+			} else if (key == 1) {
+				mouse.leftclick = false;
+				mouse.rightclick = true;
+			}
+			return true;
+		}
+	} else {
+		activeKeys.erase(key);
+		return false;
+	}
+}
+
+void Application::GetCursorPos(double* xpos, double* ypos) {
+	glfwGetCursorPos(m_window, xpos, ypos);
+}
+
+unsigned Application::GetWindowHeight() {
+	return m_height;
+}
+
+unsigned Application::GetWindowWidth() {
+	return m_width;
+}
+
+unsigned Application::GetUIHeight() {
+	return ui_height;
+}
+
+unsigned Application::GetUIWidth() {
+	return ui_width;
+}
+
+void Application::log(std::string string) {
+	std::cout << string << std::endl;
 }
 
 bool Application::IsKeyPressedOnce(unsigned short key) {
@@ -91,8 +155,10 @@ bool Application::IsKeyPressedOnce(unsigned short key) {
 			return false;
 		else 
 			return true;
-	} else 
+	} else {
 		activeKeys.erase(key);
+		return false;
+	}
 }
 
 Application::Application() {}
@@ -102,6 +168,11 @@ Application::~Application() {}
 void Application::Init() {
 	//Set the error callback
 	glfwSetErrorCallback(error_callback);
+
+	m_width = 800;
+	m_height = 600;
+	state = 1;
+	enableMouse = true;
 
 	//Initialize GLFW
 	if (!glfwInit()) exit(EXIT_FAILURE);
@@ -115,7 +186,7 @@ void Application::Init() {
 
 
 	//Create a window and create its OpenGL context
-	m_window = glfwCreateWindow(width, height, "COMG", NULL, NULL);
+	m_window = glfwCreateWindow(m_width, m_height, "COMG", NULL, NULL);
 	glfwSetWindowSizeCallback(m_window, resize_callback);
 	glfwSetCursorPosCallback(m_window, mouse_callback);
 	glfwSetScrollCallback(m_window, scroll_callback);
@@ -140,32 +211,67 @@ void Application::Init() {
 	//If GLEW hasn't initialized
 	if (err != GLEW_OK) fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 }
+void toggleState() {
+	if (!enableMouse) {
+		glfwSetCursorPosCallback(m_window, mouse_callback);
+		glfwSetScrollCallback(m_window, scroll_callback);
+		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		Application::state = 1;
+		enableMouse = true;
+	} else {
+		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		Application::state = 0;
+		mouse.reset();
+		glfwSetCursorPosCallback(m_window, NULL);
+		glfwSetScrollCallback(m_window, NULL);
+		enableMouse = false;
+	}
+}
 
 void Application::Run() {
 	//Main Loop
-	Scene *scene = new AssignmentScene2();
-	scene->Init();
+	Scene* scene;
+	Scene *scene1 = new SceneUI();
+	Scene* scene2 = new AssignmentScene2();
+	scene1->Init();
+	scene2->Init();
+	scene = scene1;
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
 	while (!glfwWindowShouldClose(m_window) && !IsKeyPressed(VK_ESCAPE)) {
 		scene->Update(m_timer.getElapsedTime(), mouse);
 		//scene->Render();
 		if (Application::IsKeyPressedOnce('T')) {
-			if (!enableMouse) {
-				glfwSetCursorPosCallback(m_window, mouse_callback);
-				glfwSetScrollCallback(m_window, scroll_callback);
-				enableMouse = true;
-			} else {
-				enableMouse = false;
+			toggleState();
+		}
+
+		if (Application::IsMousePressedOnce(0)) {
+			if (!Application::state) {
+				double x, y;
+				Application::GetCursorPos(&x, &y);
+				float posX = (x / m_width) * 80;
+				float posY = (y / m_height) * 60;
+				//Application::log(("(" + std::to_string(posX) + ", " + std::to_string(posY) + ")"));
+				if (posX >= 32 && posX <= 49 && posY <= 20 && posY >= 17) {
+					if (scene == scene1) {
+						scene = scene2;
+						toggleState();
+					}
+				}
 			}
+		}
+
+		if (Application::IsKeyPressedOnce(VK_F1)) {
+			scene = scene1;
+			if (!enableMouse)
+				toggleState();
+		} else if (Application::IsKeyPressedOnce(VK_F2)) {
+			scene = scene2;
+			if (!enableMouse)
+				toggleState();
 		}
 		if (enableMouse) {
 			mouse.reset();
-			glfwSetCursorPos(m_window, width / 2, height / 2);
-		}
-		else {
-			glfwSetCursorPosCallback(m_window, NULL);
-			glfwSetScrollCallback(m_window, NULL);
-			mouse.reset();
+			glfwSetCursorPos(m_window, m_width / 2, m_height / 2);
 		}
 		//Swap buffers
 		glfwSwapBuffers(m_window);
@@ -174,8 +280,10 @@ void Application::Run() {
         m_timer.waitUntil(frameTime);       // Frame rate limiter. Limits each frame to a specified time in ms.   
 
 	} //Check if the ESC key had been pressed or if the window had been closed
-	scene->Exit();
-	delete scene;
+	scene1->Exit();
+	scene2->Exit();
+	delete scene1;
+	delete scene2;
 }
 
 void Application::Exit() {
