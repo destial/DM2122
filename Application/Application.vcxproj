@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\AssignmentScene.cpp" />
+    <ClCompile Include="Source\AssignmentScene2.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\Camera3.cpp" />
     <ClCompile Include="Source\LoadOBJ.cpp" />
@@ -168,6 +169,7 @@
   <ItemGroup>
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\AssignmentScene.h" />
+    <ClInclude Include="Source\AssignmentScene2.h" />
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\Camera3.h" />
     <ClInclude Include="Source\Light.h" />

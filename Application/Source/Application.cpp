@@ -23,6 +23,7 @@
 #include "SceneSkybox.h"
 #include "SceneModel.h"
 #include "SceneText.h"
+#include "AssignmentScene2.h"
 
 GLFWwindow* m_window;
 const unsigned char FPS = 60; // FPS of this game
@@ -116,6 +117,8 @@ void Application::Init() {
 	//Create a window and create its OpenGL context
 	m_window = glfwCreateWindow(width, height, "COMG", NULL, NULL);
 	glfwSetWindowSizeCallback(m_window, resize_callback);
+	glfwSetCursorPosCallback(m_window, mouse_callback);
+	glfwSetScrollCallback(m_window, scroll_callback);
 	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	//If the window couldn't be created
 	if (!m_window) {
@@ -140,7 +143,7 @@ void Application::Init() {
 
 void Application::Run() {
 	//Main Loop
-	Scene *scene = new SceneText();
+	Scene *scene = new AssignmentScene2();
 	scene->Init();
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
 	while (!glfwWindowShouldClose(m_window) && !IsKeyPressed(VK_ESCAPE)) {
@@ -156,8 +159,6 @@ void Application::Run() {
 			}
 		}
 		if (enableMouse) {
-			glfwSetCursorPosCallback(m_window, mouse_callback);
-			glfwSetScrollCallback(m_window, scroll_callback);
 			mouse.reset();
 			glfwSetCursorPos(m_window, width / 2, height / 2);
 		}
