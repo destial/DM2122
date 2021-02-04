@@ -222,7 +222,7 @@ Mesh* MeshBuilder::GenerateSphere(const std::string& meshName, Color color, unsi
 
 			v.pos.Set(radius * sphereX(phi, theta), radius * sphereY(phi, theta), radius * sphereZ(phi, theta));
 
-			v.texCoord.Set(slice/numSlice, stack/numStack);
+			v.texCoord.Set(slice, stack);
 
 			v.normal.Set(sphereX(phi, theta), sphereY(phi, theta), sphereZ(phi, theta));
 			v.normal.Normalize();

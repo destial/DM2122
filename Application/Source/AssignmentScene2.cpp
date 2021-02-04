@@ -45,9 +45,9 @@ void AssignmentScene2::Init() {
 	glUseProgram(m_programID);
 
 	light[0].type = Light::LIGHT_DIRECTIONAL;
-	light[0].position.Set(0, 15, 0);
+	light[0].position.Set(15, 35, 15);
 	light[0].color = WHITE;
-	light[0].power = 1;
+	light[0].power = 0.7f;
 	light[0].kC = 1.f;
 	light[0].kL = 0.01f;
 	light[0].kQ = 0.001f;
@@ -73,11 +73,14 @@ void AssignmentScene2::Init() {
 
 	meshList[GEO_CYL] = MeshBuilder::GenerateCylinder("cyl", BROWN, 30, 0.6f, 11);
 
-	meshList[GEO_CONE] = MeshBuilder::GenerateCone("cone", PURPLE, 30, 1, 1);
+	meshList[GEO_CONE] = MeshBuilder::GenerateCone("cone", PURPLE, 30, 1, 5);
 
 	meshList[GEO_SPHERE2] = MeshBuilder::GenerateSphere("dot", BLACK, 30, 30, 1);
 
 	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("body", WHITE, 30, 30, 1);
+
+	meshList[GEO_SUN] = MeshBuilder::GenerateSphere("sun", YELLOW, 30, 30, 5);
+	meshList[GEO_SUN]->textureID = LoadTGA("Image//sun.tga");
 
 	meshList[GEO_FRONT] = MeshBuilder::GenerateQuad("front", WHITE, 1.f, 1.f);
 	meshList[GEO_FRONT]->textureID = LoadTGA("Image//front-space.tga");
@@ -285,6 +288,23 @@ void AssignmentScene2::RenderTextOnScreen(Mesh* mesh, std::string text, Color co
 	glEnable(GL_DEPTH_TEST);
 }
 
+void AssignmentScene2::RenderFacingText(Mesh* mesh, std::string text, Color color, float size, float x, float y, float z) {
+	modelStack.PushMatrix();
+	modelStack.Translate(x, y, z);
+	modelStack.Scale(size, size, size);
+	Vector3 origin = Vector3(0, 0, 1);
+	Vector3 pos = Vector3(x, 0, z);
+	Vector3 lookAt = (camera.position - pos).Normalized();
+	lookAt.y = 0;
+	Mtx44 rotation;
+	float uv = (origin.x * lookAt.x + origin.z * lookAt.z) / ((sqrt(origin.x * origin.x + origin.z * origin.z)) * sqrt(lookAt.x * lookAt.x + lookAt.z * lookAt.z));
+	double angle = Math::RadianToDegree(acos(uv));
+	if (angle >= 180)
+	modelStack.Rotate(angle, 0, 1, 0);
+	RenderText(mesh, text, color);
+	modelStack.PopMatrix();
+}
+
 void AssignmentScene2::RenderImageOnScreen(Mesh* mesh, float size, float x, float y) {
 	if (!mesh || mesh->textureID <= 0) //Proper error check
 		return;
@@ -369,6 +389,17 @@ void AssignmentScene2::RenderSkybox() {
 	modelStack.Scale(scaleVal, scaleVal, scaleVal);
 	modelStack.Rotate(90, 1, 0, 0);
 	RenderMesh(meshList[GEO_GROUND], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	objects[GEO_SUN].rotate += 0.5f;
+	if (objects[GEO_SUN].rotate >= 360.f)
+		objects[GEO_SUN].rotate = 0;
+	modelStack.Rotate(objects[GEO_SUN].rotate, 0, 1, 0);
+	modelStack.Translate(light[0].position.x, light[0].position.y, light[0].position.z);
+	modelStack.Rotate(objects[GEO_SUN].rotate, 0, 1, 0);
+	modelStack.Scale(0.5, 0.5, 0.5);
+	RenderMesh(meshList[GEO_SUN], false);
 	modelStack.PopMatrix();
 }
 
@@ -482,6 +513,28 @@ void AssignmentScene2::RenderA01Character() {
 	modelStack.Scale(leftarm.scale, leftarm.scale, leftarm.scale);
 	RenderMesh(meshList[GEO_CYL], true);
 	modelStack.PopMatrix();
+
+	for (unsigned i = 0; i < 5; ++i) {
+		modelStack.PushMatrix();
+		hail.translate.y = (-(rand() % 2 + 3)) * hail.translate.y;
+		if (hail.translate.y <= -1) {
+			hail.translate.x = (rand() % 40 - 20);
+			hail.translate.y = 5;
+			hail.translate.z = (rand() % 40 - 20);
+		}
+		modelStack.Translate(hail.translate.x, hail.translate.y, hail.translate.z);
+		unsigned ran = rand() % 2 + 1;
+		if (ran == 1)
+			modelStack.Scale(hail.scale * 1.5, hail.scale * 1.5, hail.scale * 1.5);
+		else if (ran == 2)
+			modelStack.Scale(hail.scale * 0.5, hail.scale * 0.5, hail.scale * 0.5);
+		else
+			modelStack.Scale(hail.scale, hail.scale, hail.scale);
+		RenderMesh(meshList[GEO_SPHERE], false);
+		modelStack.PopMatrix();
+	}
+
+	RenderFacingText(meshList[GEO_TEXT], "Bow down to me", WHITE, 1, head.translate.x, head.translate.y+5, head.translate.z);
 }
 
 void AssignmentScene2::Render() {
@@ -513,11 +566,11 @@ void AssignmentScene2::Render() {
 
 	RenderSkybox(); 
 
-	modelStack.PushMatrix();
+	/*modelStack.PushMatrix();
 	objects[GEO_HOUSE1].scale = 0.1f;
 	modelStack.Scale(objects[GEO_HOUSE1].scale, objects[GEO_HOUSE1].scale, objects[GEO_HOUSE1].scale);
 	RenderMesh(meshList[GEO_HOUSE1], true);
-	modelStack.PopMatrix();
+	modelStack.PopMatrix();*/
 
 	modelStack.PushMatrix();
 	objects[GEO_HOUSE2].translate.x = 5;
@@ -528,7 +581,19 @@ void AssignmentScene2::Render() {
 
 	for (unsigned i = 5; i < 15; i++) {
 		modelStack.PushMatrix();
+		objects[GEO_TREE].translate.z = 0;
 		objects[GEO_TREE].translate.x = i * 1.5f;
+		objects[GEO_TREE].scale = 2;
+		modelStack.Translate(objects[GEO_TREE].translate.x, objects[GEO_TREE].translate.y, objects[GEO_TREE].translate.z);
+		modelStack.Scale(objects[GEO_TREE].scale, objects[GEO_TREE].scale, objects[GEO_TREE].scale);
+		RenderMesh(meshList[GEO_TREE], true);
+		modelStack.PopMatrix();
+	}
+
+	for (unsigned i = 5; i < 15; i++) {
+		modelStack.PushMatrix();
+		objects[GEO_TREE].translate.x = 0;
+		objects[GEO_TREE].translate.z = i * 1.5f;
 		objects[GEO_TREE].scale = 2;
 		modelStack.Translate(objects[GEO_TREE].translate.x, objects[GEO_TREE].translate.y, objects[GEO_TREE].translate.z);
 		modelStack.Scale(objects[GEO_TREE].scale, objects[GEO_TREE].scale, objects[GEO_TREE].scale);
@@ -556,26 +621,30 @@ void AssignmentScene2::Reset() {
 	head.translate.y = 6.9;
 	head.translate.z = 0;
 	head.rotate = 0;
-	head.scale = 0.05;
+	head.scale = 1.2;
 
-	lefteye.scale = 0.01;
+	lefteye.scale = 0.2;
 
 	body.translate.x = 0;
 	body.translate.y = 0;
-	body.translate.z = 5;
-	body.scale = 0.1;
+	body.translate.z = 0;
+	body.scale = 3;
 
 	middle.translate.x = 0;
 	middle.translate.y = 4;
 	middle.translate.z = 0;
-	middle.scale = 0.07;
+	middle.scale = 2;
 
 	nose.rotate = -90;
-	nose.scale = 0.07;
+	nose.scale = 0.5;
 
 	leftarm.rotate = 40;
-	leftarm.scale = 0.05;
+	leftarm.scale = 0.3;
 
-	hail.scale = 0.2;
+	hail.scale = 0.05;
 	hail.translate.y = 10;
+
+	object.translate.z = -10;
+	object.translate.y = head.translate.y;
+	object.scale = 0.7;
 }

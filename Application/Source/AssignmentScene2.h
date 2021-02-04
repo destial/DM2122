@@ -20,6 +20,7 @@ class AssignmentScene2 : public Scene {
 		GEO_SPHERE,
 		GEO_SPHERE2,
 		GEO_CONE,
+		GEO_SUN,
 		GEO_CYL,
 		GEO_LEFT,
 		GEO_RIGHT,
@@ -94,6 +95,7 @@ private:
 	void RenderMesh(Mesh* mesh, bool enableLight);
 	void RenderText(Mesh* mesh, std::string text, Color color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
+	void RenderFacingText(Mesh* mesh, std::string text, Color color, float size, float x, float y, float z);
 	void RenderImageOnScreen(Mesh* mesh, float size, float x, float y);
 	void RenderSkybox();
 	void RenderA01Character();
