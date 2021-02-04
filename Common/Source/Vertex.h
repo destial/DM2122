@@ -29,25 +29,23 @@ struct Color {
 
 struct Transform {
 	float rotate;
-	float translateX;
-	float translateY;
-	float translateZ;
+	Vector3 translate;
 	float scale;
 	Transform(float r = 0, float tX = 0, float tY = 0, float tZ = 0, float s = 1) {
 		Set(r, tX, tY, tZ, s);
 	}
 	void Set(float r, float tX, float tY, float tZ, float s) {
 		this->rotate = r;
-		this->translateX = tX;
-		this->translateY = tY;
-		this->translateZ = tZ;
+		this->translate.x = tX;
+		this->translate.y = tY;
+		this->translate.z = tZ;
 		this->scale = s;
 	}
 	void Set(Transform& t) {
 		this->rotate = t.rotate;
-		this->translateX = t.translateX;
-		this->translateY = t.translateY;
-		this->translateZ = t.translateZ;
+		this->translate.x = t.translate.x;
+		this->translate.y = t.translate.y;
+		this->translate.z = t.translate.z;
 		this->scale = t.scale;
 	}
 };

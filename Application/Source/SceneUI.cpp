@@ -86,34 +86,11 @@ void SceneUI::Init() {
 	meshList[GEO_BOTTOM] = MeshBuilder::GenerateQuad("bottom", WHITE, 1.f, 1.f);
 	meshList[GEO_BOTTOM]->textureID = LoadTGA("Image//bottom-space.tga");
 
-	meshList[GEO_QUAD] = MeshBuilder::GenerateQuad("quad", WHITE, 1.f, 1.f);
-	meshList[GEO_QUAD]->textureID = LoadTGA("Image//pogchamp.tga");
-
-	meshList[GEO_CROSSHAIR] = MeshBuilder::GenerateQuad("crosshair", WHITE, 1.f, 1.f);
-	meshList[GEO_CROSSHAIR]->textureID = LoadTGA("Image//crosshair.tga");
-
-	meshList[GEO_MODEL1] = MeshBuilder::GenerateOBJ("chair", "OBJ//chair.obj");
-	meshList[GEO_MODEL1]->textureID = LoadTGA("Image//chair.tga");
-
-	meshList[GEO_MODEL2] = MeshBuilder::GenerateOBJ("dart", "OBJ//dart.obj");
-	meshList[GEO_MODEL2]->textureID = LoadTGA("Image//dart.tga");
-
-	meshList[GEO_MODEL3] = MeshBuilder::GenerateOBJ("dartboard", "OBJ//dartboard.obj");
-	meshList[GEO_MODEL3]->textureID = LoadTGA("Image//dartboard.tga");
-
-	meshList[GEO_MODEL4] = MeshBuilder::GenerateOBJ("doorman", "OBJ//doorman.obj");
-	meshList[GEO_MODEL4]->textureID = LoadTGA("Image//doorman.tga");
-
-	meshList[GEO_MODEL5] = MeshBuilder::GenerateOBJ("shoe", "OBJ//shoe.obj");
-	meshList[GEO_MODEL5]->textureID = LoadTGA("Image//shoe.tga");
-
-	meshList[GEO_MODEL6] = MeshBuilder::GenerateOBJ("winebottle", "OBJ//winebottle.obj");
-	meshList[GEO_MODEL6]->textureID = LoadTGA("Image//winebottle.tga");
+	meshList[GEO_BUTTON] = MeshBuilder::GenerateQuad("button", WHITE, 1.f, 1.f);
+	meshList[GEO_BUTTON]->textureID = LoadTGA("Image//button.tga");
 
 	meshList[GEO_TEXT] = MeshBuilder::GenerateText("text", 16, 16);
 	meshList[GEO_TEXT]->textureID = LoadTGA("Image//calibri.tga");
-
-	meshList[GEO_SPHERE] = MeshBuilder::GenerateSphere("pointer", WHITE, 30, 30, 1.f);
 
 	bounds = 300.f;
 	float fov = 45.f;
@@ -183,18 +160,20 @@ void SceneUI::Update(double dt, Mouse mouse) {
 	light[0].position.x = camera.position.x;
 	light[0].position.y = camera.position.y;
 	light[0].position.z = camera.position.z;
-	camera.Update(dt, mouse);
+	//camera.Update(dt, mouse);
 	Mtx44 projection;
 	projection.SetToPerspective(camera.fov, 40.0f / 30.0f, 0.1f, bounds);
 	projectionStack.LoadMatrix(projection);
 
 	Render();
 
-	std::string fpsString = std::to_string(fps).substr(0, std::to_string(fps).find('.') + 4);
-	RenderTextOnScreen(meshList[GEO_TEXT], ("FPS: " + fpsString), Color(0, 1, 0), 4, 0, 55);
-	RenderImageOnScreen(meshList[GEO_QUAD], 10, 40, 40);
-	RenderTextOnScreen(meshList[GEO_TEXT], "Click", Color(0, 1, 0), 4, 30, 40);
-	RenderImageOnScreen(meshList[GEO_CROSSHAIR], 4, 40, 30);
+	RenderTextOnScreen(meshList[GEO_TEXT], "203344W - A02", WHITE, 4, 5, 55);
+	RenderImageOnScreen(meshList[GEO_BUTTON], 10, 40, 40);
+	RenderTextOnScreen(meshList[GEO_TEXT], "Play", BLACK, 4, 38, 38);
+
+	RenderImageOnScreen(meshList[GEO_BUTTON], 10, 40, 10);
+	RenderTextOnScreen(meshList[GEO_TEXT], "Quit", BLACK, 4, 38, 8);
+	//RenderImageOnScreen(meshList[GEO_CROSSHAIR], 4, 40, 30);
 }
 
 void SceneUI::RenderMesh(Mesh* mesh, bool enableLight) {
@@ -244,7 +223,7 @@ void SceneUI::RenderText(Mesh* mesh, std::string text, Color color) {
 	glUniform1i(m_parameters[U_COLOR_TEXTURE], 0);
 	for (unsigned i = 0; i < text.length(); ++i) {
 		Mtx44 characterSpacing;
-		characterSpacing.SetToTranslation(i * 0.7f, 0, 0); //1.0f is the spacing of each character, you may change this value
+		characterSpacing.SetToTranslation(i * 0.1f, 0, 0); //1.0f is the spacing of each character, you may change this value
 		Mtx44 MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top() * characterSpacing;
 		glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
 
@@ -280,7 +259,7 @@ void SceneUI::RenderTextOnScreen(Mesh* mesh, std::string text, Color color, floa
 	glUniform1i(m_parameters[U_COLOR_TEXTURE], 0);
 	for (unsigned i = 0; i < text.length(); ++i) {
 		Mtx44 characterSpacing;
-		characterSpacing.SetToTranslation(0.5f + i * 1.0f, 0.5f, 0);
+		characterSpacing.SetToTranslation(i * 0.5f, 0.5f, 0);
 		Mtx44 MVP = projectionStack.Top() * viewStack.Top() * modelStack.Top() * characterSpacing;
 		glUniformMatrix4fv(m_parameters[U_MVP], 1, GL_FALSE, &MVP.a[0]);
 
@@ -370,9 +349,9 @@ void SceneUI::Render() {
 
 	viewStack.LoadIdentity();
 	viewStack.LookAt(
-		camera.position.x, camera.position.y, camera.position.z, 
-		camera.target.x, camera.target.y, camera.target.z, 
-		camera.up.x, camera.up.y, camera.up.z
+		1, 0, 1, 
+		0, 0, 0, 
+		0, 1, 0
 	);
 	modelStack.LoadIdentity();
 
@@ -392,54 +371,7 @@ void SceneUI::Render() {
 		glUniform3fv(m_parameters[U_LIGHT0_POSITION], 1, &lightPosition_cameraspace.x);
 	}
 
-	modelStack.PushMatrix();
-	RenderMesh(meshList[GEO_AXES], false);
-	modelStack.PopMatrix();
-
 	RenderSkybox();
-
-	modelStack.PushMatrix();
-	RenderMesh(meshList[GEO_MODEL1], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	RenderMesh(meshList[GEO_MODEL2], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	RenderMesh(meshList[GEO_MODEL3], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	RenderMesh(meshList[GEO_MODEL4], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	RenderMesh(meshList[GEO_MODEL5], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	RenderMesh(meshList[GEO_MODEL6], true);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	modelStack.Translate(0, 8, 0);
-	modelStack.Scale(3, 3, 3);
-	RenderMesh(meshList[GEO_QUAD], false);
-	modelStack.PopMatrix();
-
-	modelStack.PushMatrix();
-	RenderText(meshList[GEO_TEXT], "Hello World", BLUE);
-	modelStack.PopMatrix();
-	
-	modelStack.PushMatrix();
-	RenderTextOnScreen(meshList[GEO_TEXT], "Hello Screen", RED, 4, 0, 0);
-	modelStack.PopMatrix();
-
-	/*modelStack.PushMatrix();
-	modelStack.Translate(camera.target.x, camera.target.y, camera.target.z);
-	RenderMesh(meshList[GEO_SPHERE], false);
-	modelStack.PopMatrix();*/
 }
 
 void SceneUI::Exit() {

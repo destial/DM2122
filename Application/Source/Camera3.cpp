@@ -2,9 +2,7 @@
 #include "Application.h"
 #include "Mtx44.h"
 
-Camera3::Camera3() {
-	fov = 45.f;
-}
+Camera3::Camera3() {}
 
 Camera3::~Camera3() {}
 
@@ -13,6 +11,7 @@ void Camera3::Init(const Vector3& pos, const Vector3& target, const Vector3& up,
 	this->target = target;
 	this->fov = fov;
 	this->up = up;
+	jumpFrame = 0;
 }
 
 void Camera3::Reset() {
@@ -24,38 +23,41 @@ void Camera3::Reset() {
 
 void Camera3::Update(double &dt, Mouse& mouse) {
 	const float SENSITIVITY = 4.f * dt;
-
 	Vector3 view = (target - position).Normalized();
-	Vector3 right = view.Cross(this->up).Normalized();
 
 	if (mouse.left) {
 		Mtx44 rotation;
-		rotation.SetToRotation((mouse.x_diff * SENSITIVITY), this->up.x, this->up.y, this->up.z);
+		rotation.SetToRotation((mouse.x_diff * SENSITIVITY), up.x, up.y, up.z);
 		view = (rotation * view).Normalized();
 		target = position + view;
 	} else if (mouse.right) {
 		Mtx44 rotation;
-		rotation.SetToRotation((-mouse.x_diff * SENSITIVITY), this->up.x, this->up.y, this->up.z);
+		rotation.SetToRotation((-mouse.x_diff * SENSITIVITY), up.x, up.y, up.z);
 		view = (rotation * view).Normalized();
 		target = position + view;
-	} 
+	}
+
+	view = (target - position).Normalized();
+	Vector3 right = view.Cross(up).Normalized();
+	right.y = 0;
 
 	if (mouse.down) {
-		right = view.Cross(this->up).Normalized();
 		Mtx44 rotation;
 		rotation.SetToRotation((-mouse.y_diff * SENSITIVITY), right.x, right.y, right.z);
 		view = (rotation * view).Normalized();
 		target = position + view;
-		//this->up = right.Cross(view).Normalized();
 	} else if (mouse.up) {
-		right = view.Cross(this->up).Normalized();
 		Mtx44 rotation;
 		rotation.SetToRotation((mouse.y_diff * SENSITIVITY), right.x, right.y, right.z);
 		view = (rotation * view).Normalized();
 		target = position + view;
-		//this->up = right.Cross(view).Normalized();
 	}
 
+	view = (target - position).Normalized();
+	up = right.Cross(view).Normalized();
+	if (up.y < 0.5f) {
+		up.y = 0.5f;
+	}
 	if (position != target)
 		fov += fov * mouse.scroll * SENSITIVITY;
 
@@ -88,7 +90,15 @@ void Camera3::Update(double &dt, Mouse& mouse) {
 	}
 
 	if (Application::IsKeyPressed(' ')) {
+		if (jumpFrame == 0 && position.y <= 0.5f) {
+			jumpFrame++;
+		}
+	}
+	if (jumpFrame != 0 && jumpFrame < 10) {
 		position.y += SENSITIVITY;
 		target.y += SENSITIVITY;
+		jumpFrame++;
+	} else {
+		jumpFrame = 0;
 	}
 }

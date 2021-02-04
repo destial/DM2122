@@ -17,29 +17,20 @@
 
 class AssignmentScene2 : public Scene {
 	enum GEOMETRY_TYPE {
-		GEO_AXES = 0,
 		GEO_SPHERE,
 		GEO_SPHERE2,
-		GEO_LIGHT,
-		GEO_QUAD,
-		GEO_CROSSHAIR,
-		GEO_CIRCLE,
-		GEO_CYL,
 		GEO_CONE,
-		GEO_CUBE,
-		GEO_TORUS,
+		GEO_CYL,
 		GEO_LEFT,
 		GEO_RIGHT,
 		GEO_TOP,
 		GEO_BOTTOM,
 		GEO_FRONT,
 		GEO_BACK,
-		GEO_MODEL1,
-		GEO_MODEL2,
-		GEO_MODEL3,
-		GEO_MODEL4,
-		GEO_MODEL5,
-		GEO_MODEL6,
+		GEO_HOUSE1,
+		GEO_HOUSE2,
+		GEO_TREE,
+		GEO_GROUND,
 		GEO_TEXT,
 		NUM_GEOMETRY,
 	};
@@ -82,11 +73,12 @@ private:
 	unsigned m_programID;
 	unsigned m_parameters[U_TOTAL];
 	Mesh* meshList[NUM_GEOMETRY];
+	Transform objects[NUM_GEOMETRY];
+	Transform head, body, middle, leftarm, rightarm, nose, lefteye, righteye, hail, object;
 	bool lighton, reverse, hit, complete;
 	Light light[1];
 	MS modelStack, viewStack, projectionStack;
 	Camera3 camera;
-	Transform head, body, middle, leftarm, rightarm, nose, lefteye, righteye, hail, object;
 	float bounds;
 
 	Color RED = Color(1.f, 0.f, 0.f);
@@ -104,6 +96,7 @@ private:
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
 	void RenderImageOnScreen(Mesh* mesh, float size, float x, float y);
 	void RenderSkybox();
+	void RenderA01Character();
 	void Reset();
 public:
 	AssignmentScene2();

@@ -27,7 +27,6 @@
 const unsigned char FPS = 60; // FPS of this game
 const unsigned int frameTime = 1000 / FPS; // time for each frame
 Mouse mouse;
-bool enableMouse;
 std::set<unsigned short> Application::activeKeys;
 unsigned Application::m_width;
 unsigned Application::m_height;
@@ -123,6 +122,12 @@ bool Application::IsMousePressedOnce(unsigned short key) {
 	}
 }
 
+enum STATES {
+	MENU,
+	GAME,
+	START,
+};
+
 void Application::GetCursorPos(double* xpos, double* ypos) {
 	glfwGetCursorPos(m_window, xpos, ypos);
 }
@@ -171,8 +176,7 @@ void Application::Init() {
 
 	m_width = 800;
 	m_height = 600;
-	state = 1;
-	enableMouse = true;
+	state = START;
 
 	//Initialize GLFW
 	if (!glfwInit()) exit(EXIT_FAILURE);
@@ -188,9 +192,9 @@ void Application::Init() {
 	//Create a window and create its OpenGL context
 	m_window = glfwCreateWindow(m_width, m_height, "COMG", NULL, NULL);
 	glfwSetWindowSizeCallback(m_window, resize_callback);
-	glfwSetCursorPosCallback(m_window, mouse_callback);
-	glfwSetScrollCallback(m_window, scroll_callback);
-	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+	//glfwSetCursorPosCallback(m_window, mouse_callback);
+	//glfwSetScrollCallback(m_window, scroll_callback);
+	//glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	//If the window couldn't be created
 	if (!m_window) {
 		fprintf( stderr, "Failed to open GLFW window.\n" );
@@ -212,19 +216,17 @@ void Application::Init() {
 	if (err != GLEW_OK) fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 }
 void toggleState() {
-	if (!enableMouse) {
+	if (Application::state == MENU || Application::state == START) {
 		glfwSetCursorPosCallback(m_window, mouse_callback);
 		glfwSetScrollCallback(m_window, scroll_callback);
 		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-		Application::state = 1;
-		enableMouse = true;
+		Application::state = GAME;
 	} else {
 		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-		Application::state = 0;
 		mouse.reset();
 		glfwSetCursorPosCallback(m_window, NULL);
 		glfwSetScrollCallback(m_window, NULL);
-		enableMouse = false;
+		Application::state = MENU;
 	}
 }
 
@@ -237,39 +239,40 @@ void Application::Run() {
 	scene2->Init();
 	scene = scene1;
 	m_timer.startTimer();    // Start timer to calculate how long it takes to render this frame
-	while (!glfwWindowShouldClose(m_window) && !IsKeyPressed(VK_ESCAPE)) {
+	while (!glfwWindowShouldClose(m_window)) {// && !IsKeyPressed(VK_ESCAPE)) {
 		scene->Update(m_timer.getElapsedTime(), mouse);
 		//scene->Render();
-		if (Application::IsKeyPressedOnce('T')) {
-			toggleState();
-		}
 
 		if (Application::IsMousePressedOnce(0)) {
-			if (!Application::state) {
+			if (Application::state == MENU || Application::state == START) {
 				double x, y;
 				Application::GetCursorPos(&x, &y);
 				float posX = (x / m_width) * 80;
 				float posY = (y / m_height) * 60;
 				//Application::log(("(" + std::to_string(posX) + ", " + std::to_string(posY) + ")"));
-				if (posX >= 32 && posX <= 49 && posY <= 20 && posY >= 17) {
+				if (posX >= 35 && posX <= 45 && posY <= 22 && posY >= 17) {
 					if (scene == scene1) {
 						scene = scene2;
 						toggleState();
+					}
+				} else if (posX >= 35 && posX <= 45 && posY <= 52 && posY >= 47) {
+					if (scene == scene1) {
+						break;
 					}
 				}
 			}
 		}
 
-		if (Application::IsKeyPressedOnce(VK_F1)) {
-			scene = scene1;
-			if (!enableMouse)
+		if (Application::IsKeyPressedOnce(VK_ESCAPE)) {
+			if (state == GAME) {
+				scene = scene1;
 				toggleState();
-		} else if (Application::IsKeyPressedOnce(VK_F2)) {
-			scene = scene2;
-			if (!enableMouse)
+			} else if (state == MENU) {
+				scene = scene2;
 				toggleState();
+			}
 		}
-		if (enableMouse) {
+		if (Application::state == GAME) {
 			mouse.reset();
 			glfwSetCursorPos(m_window, m_width / 2, m_height / 2);
 		}

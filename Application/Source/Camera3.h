@@ -17,6 +17,8 @@ public:
 	void Init(const Vector3& pos, const Vector3& target, const Vector3& up, const float& fov);
 	void Reset();
 	void Update(double &dt, Mouse& mouse);
+private:
+	unsigned jumpFrame;
 };
 
 #endif

@@ -1,10 +1,6 @@
 #include "Mesh.h"
 #include "Vertex.h"
 #include "GL\glew.h"
-unsigned Mesh::locationKa;
-unsigned Mesh::locationKd;
-unsigned Mesh::locationKs;
-unsigned Mesh::locationNs;
 
 Mesh::Mesh(const std::string &meshName): name(meshName), mode(DRAW_TRIANGLES), textureID(0) {
 	glGenBuffers(1, &vertexBuffer);
@@ -19,6 +15,10 @@ Mesh::~Mesh() {
 	}
 }
 
+unsigned Mesh::locationKa;
+unsigned Mesh::locationKd;
+unsigned Mesh::locationKs;
+unsigned Mesh::locationNs;
 void Mesh::SetMaterialLoc(unsigned kA, unsigned kD, unsigned kS, unsigned nS) {
 	locationKa = kA;
 	locationKd = kD;

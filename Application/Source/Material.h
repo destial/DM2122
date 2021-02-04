@@ -7,7 +7,9 @@ struct Component {
 		Set(r, g, b);
 	}
 	Component& operator=(const Component& rhs) {
-		Set(rhs.r, rhs.g, rhs.b);
+		r = rhs.r;
+		g = rhs.g;
+		b = rhs.b;
 		return *this;
 	}
 	void Set(float r, float g, float b) {

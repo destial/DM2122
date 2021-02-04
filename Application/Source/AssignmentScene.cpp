@@ -141,15 +141,15 @@ void AssignmentScene::Update(double dt) {
 	camera.Update(dt);
 	if (!complete) {
 		if (hit) {
-			if (head.translateY >= body.translateY - (0.6 * body.scale)) {
-				head.translateY -= 3 * dt;
-				head.translateZ += 3 * dt;
+			if (head.translate.y >= body.translate.y - (0.6 * body.scale)) {
+				head.translate.y -= 3 * dt;
+				head.translate.z += 3 * dt;
 				head.rotate -= 5 * dt;
 			}
 			else {
-				if (!(middle.translateY <= body.translateY - (0.38 * body.scale))) {
-					middle.translateZ += 3 * dt;
-					middle.translateY -= 3 * dt;
+				if (!(middle.translate.y <= body.translate.y - (0.38 * body.scale))) {
+					middle.translate.z += 3 * dt;
+					middle.translate.z -= 3 * dt;
 				}
 				else {
 					complete = true;
@@ -166,27 +166,27 @@ void AssignmentScene::Update(double dt) {
 			else if (leftarm.rotate <= 30) reverse = true;
 		}
 
-		if (object.translateZ >= head.translateZ - 1 || hit) {
+		if (object.translate.z >= head.translate.z - 1 || hit) {
 			hit = true;
-			object.translateZ = head.translateZ;
-			object.translateY = head.translateY;
-			object.translateX = head.translateX;
+			object.translate.z = head.translate.z;
+			object.translate.y = head.translate.y;
+			object.translate.x = head.translate.x;
 		}
 		else {
-			object.translateZ += 3 * dt;
+			object.translate.z += 3 * dt;
 		}
 	}
 	else {
 		body.scale += 0.1 * dt;
-		body.translateY += 0.1 * dt;
+		body.translate.y += 0.1 * dt;
 
 		middle.scale += 0.1 * dt;
-		middle.translateY += 0.1 * dt;
+		middle.translate.y += 0.1 * dt;
 
 		head.scale += 0.1 * dt;
-		head.translateY += 0.1 * dt;
+		head.translate.y += 0.1 * dt;
 	}
-	hail.translateY -= 5.0f * dt;
+	hail.translate.y -= 5.0f * dt;
 }
 
 void AssignmentScene::RenderMesh(Mesh* mesh, bool enableLight) {
@@ -252,21 +252,21 @@ void AssignmentScene::Render() {
 
 	// Bottom body
 	modelStack.PushMatrix();
-	modelStack.Translate(body.translateX, body.translateY, body.translateZ);
+	modelStack.Translate(body.translate.x, body.translate.y, body.translate.z);
 	modelStack.Scale(body.scale, body.scale, body.scale);
 	RenderMesh(meshList[GEO_SPHERE], true);
 	modelStack.PopMatrix();
 
 	// Middle body
 	modelStack.PushMatrix();
-	modelStack.Translate(middle.translateX, middle.translateY, middle.translateZ);
+	modelStack.Translate(middle.translate.x, middle.translate.y, middle.translate.z);
 	modelStack.Scale(middle.scale, middle.scale, middle.scale);
 	RenderMesh(meshList[GEO_SPHERE], true);
 	modelStack.PopMatrix();
 
 	// Head
 	modelStack.PushMatrix();
-	modelStack.Translate(head.translateX, head.translateY, head.translateZ);
+	modelStack.Translate(head.translate.x, head.translate.y, head.translate.z);
 	modelStack.Rotate(head.rotate, 1, 0, 0);
 	modelStack.Scale(head.scale, head.scale, head.scale);
 	RenderMesh(meshList[GEO_SPHERE], true);
@@ -274,14 +274,14 @@ void AssignmentScene::Render() {
 
 	// Eyes
 	modelStack.PushMatrix();
-	modelStack.Translate(head.translateX + 1, head.translateY + 0.3, head.translateZ - 0.6);
+	modelStack.Translate(head.translate.x + 1, head.translate.y + 0.3, head.translate.z - 0.6);
 	modelStack.Rotate(head.rotate, 1, 0, 0);
 	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
 	RenderMesh(meshList[GEO_SPHERE2], true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(head.translateX + 1, head.translateY+0.3, head.translateZ + 0.6);
+	modelStack.Translate(head.translate.x + 1, head.translate.y+0.3, head.translate.z + 0.6);
 	modelStack.Rotate(head.rotate, 1, 0, 0);
 	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
 	RenderMesh(meshList[GEO_SPHERE2], true);
@@ -289,57 +289,57 @@ void AssignmentScene::Render() {
 
 	// Middle dots
 	modelStack.PushMatrix();
-	modelStack.Translate(middle.translateX + middle.scale - 0.2, middle.translateY + 1, middle.translateZ);
+	modelStack.Translate(middle.translate.x + middle.scale - 0.2, middle.translate.y + 1, middle.translate.z);
 	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
 	RenderMesh(meshList[GEO_SPHERE2], true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(middle.translateX + middle.scale, middle.translateY, middle.translateZ);
+	modelStack.Translate(middle.translate.x + middle.scale, middle.translate.y, middle.translate.z);
 	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
 	RenderMesh(meshList[GEO_SPHERE2], true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(middle.translateX + middle.scale - 0.2, middle.translateY - 1, middle.translateZ);
+	modelStack.Translate(middle.translate.x + middle.scale - 0.2, middle.translate.y - 1, middle.translate.z);
 	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
 	RenderMesh(meshList[GEO_SPHERE2], true);
 	modelStack.PopMatrix();
 
 	// Bottom body dots
 	modelStack.PushMatrix();
-	modelStack.Translate(body.translateX + body.scale - 0.7, body.translateY + 2, body.translateZ);
+	modelStack.Translate(body.translate.x + body.scale - 0.7, body.translate.y + 2, body.translate.z);
 	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
 	RenderMesh(meshList[GEO_SPHERE2], true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(body.translateX + body.scale - 0.2, body.translateY + 1, body.translateZ);
+	modelStack.Translate(body.translate.x + body.scale - 0.2, body.translate.y + 1, body.translate.z);
 	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
 	RenderMesh(meshList[GEO_SPHERE2], true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(body.translateX + body.scale, body.translateY, body.translateZ);
+	modelStack.Translate(body.translate.x + body.scale, body.translate.y, body.translate.z);
 	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
 	RenderMesh(meshList[GEO_SPHERE2], true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(body.translateX + body.scale - 0.2, body.translateY - 1, body.translateZ);
+	modelStack.Translate(body.translate.x + body.scale - 0.2, body.translate.y - 1, body.translate.z);
 	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
 	RenderMesh(meshList[GEO_SPHERE2], true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(body.translateX + body.scale - 0.7, body.translateY - 2, body.translateZ);
+	modelStack.Translate(body.translate.x + body.scale - 0.7, body.translate.y - 2, body.translate.z);
 	modelStack.Scale(lefteye.scale, lefteye.scale, lefteye.scale);
 	RenderMesh(meshList[GEO_SPHERE2], true);
 	modelStack.PopMatrix();
 
 	// Nose
 	modelStack.PushMatrix();
-	modelStack.Translate(head.translateX+1, head.translateY, head.translateZ);
+	modelStack.Translate(head.translate.x+1, head.translate.y, head.translate.z);
 	modelStack.Rotate(nose.rotate, 0, 0, 1);
 	modelStack.Scale(nose.scale, nose.scale, nose.scale);
 	RenderMesh(meshList[GEO_CONE], true);
@@ -347,14 +347,14 @@ void AssignmentScene::Render() {
 
 	// Arm
 	modelStack.PushMatrix();
-	modelStack.Translate(middle.translateX, middle.translateY+0.5, middle.translateZ + 2.1);
+	modelStack.Translate(middle.translate.x, middle.translate.y+0.5, middle.translate.z + 2.1);
 	modelStack.Rotate(leftarm.rotate, 1, 0, 0);
 	modelStack.Scale(leftarm.scale, leftarm.scale, leftarm.scale);
 	RenderMesh(meshList[GEO_CYL], true);
 	modelStack.PopMatrix();
 
 	modelStack.PushMatrix();
-	modelStack.Translate(middle.translateX, middle.translateY+0.5, middle.translateZ - 2.1);
+	modelStack.Translate(middle.translate.x, middle.translate.y+0.5, middle.translate.z - 2.1);
 	modelStack.Rotate(-leftarm.rotate, 1, 0, 0);
 	modelStack.Scale(leftarm.scale, leftarm.scale, leftarm.scale);
 	RenderMesh(meshList[GEO_CYL], true);
@@ -364,9 +364,9 @@ void AssignmentScene::Render() {
 	srand(time(NULL));
 	for (unsigned i = 0; i < 100; i++) {
 		float x = rand() % 40 - 20;
-		float y = (rand() % 2 + 3) * hail.translateY;
+		float y = (rand() % 2 + 3) * hail.translate.y;
 		if (y <= -5) {
-			hail.translateY = 5;
+			hail.translate.y = 5;
 		}
 		float z = rand() % 40 - 20;
 		modelStack.PushMatrix();
@@ -383,7 +383,7 @@ void AssignmentScene::Render() {
 	}
 
 	modelStack.PushMatrix();
-	modelStack.Translate(object.translateX, object.translateY, object.translateZ);
+	modelStack.Translate(object.translate.x, object.translate.y, object.translate.z);
 	modelStack.Scale(object.scale, object.scale, object.scale);
 	RenderMesh(meshList[GEO_SPHERE], true);
 	modelStack.PopMatrix();
@@ -401,22 +401,22 @@ void AssignmentScene::Reset() {
 	hit = false;
 	complete = false;
 
-	head.translateX = 0;
-	head.translateY = 6.9;
-	head.translateZ = 0;
+	head.translate.x = 0;
+	head.translate.y = 6.9;
+	head.translate.z = 0;
 	head.rotate = 0;
 	head.scale = 1.2;
 
 	lefteye.scale = 0.2;
 
-	body.translateX = 0;
-	body.translateY = 0;
-	body.translateZ = 0;
+	body.translate.x = 0;
+	body.translate.y = 0;
+	body.translate.z = 0;
 	body.scale = 3;
 
-	middle.translateX = 0;
-	middle.translateY = 4;
-	middle.translateZ = 0;
+	middle.translate.x = 0;
+	middle.translate.y = 4;
+	middle.translate.z = 0;
 	middle.scale = 2;
 
 	nose.rotate = -90;
@@ -426,9 +426,9 @@ void AssignmentScene::Reset() {
 	leftarm.scale = 0.3;
 
 	hail.scale = 0.2;
-	hail.translateY = 10;
+	hail.translate.y = 10;
 
-	object.translateZ = -10;
-	object.translateY = head.translateY;
+	object.translate.z = -10;
+	object.translate.y = head.translate.y;
 	object.scale = 0.7;
 }
