@@ -87,11 +87,11 @@ Mesh* MeshBuilder::GenerateGround(const std::string& meshName, Color color, floa
 	v.normal.Set(0, 0, 1);
 
 	v.pos.Set(0.5f * lengthX, 0.5f * lengthY, 0.f);
-	v.texCoord.Set(10, 10);
+	v.texCoord.Set(100, 100);
 	vertex_buffer_data.push_back(v);
 
 	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, 0.f);
-	v.texCoord.Set(0, 10);
+	v.texCoord.Set(0, 100);
 	vertex_buffer_data.push_back(v);
 
 	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, 0.f);
@@ -99,7 +99,7 @@ Mesh* MeshBuilder::GenerateGround(const std::string& meshName, Color color, floa
 	vertex_buffer_data.push_back(v);
 
 	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, 0.f);
-	v.texCoord.Set(10, 0);
+	v.texCoord.Set(100, 0);
 	vertex_buffer_data.push_back(v);
 
 	index_buffer_data.push_back(0);

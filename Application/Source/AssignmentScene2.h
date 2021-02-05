@@ -22,15 +22,27 @@ class AssignmentScene2 : public Scene {
 		GEO_CONE,
 		GEO_SUN,
 		GEO_CYL,
+
+		GEO_CASTLEROOF,
+		GEO_CASTLEWALL,
+		GEO_CASTLEPILLAR,
+
+		GEO_GLOCK,
+
 		GEO_LEFT,
 		GEO_RIGHT,
 		GEO_TOP,
 		GEO_BOTTOM,
 		GEO_FRONT,
 		GEO_BACK,
+
 		GEO_HOUSE1,
 		GEO_HOUSE2,
 		GEO_TREE,
+
+		GEO_TREETOP,
+		GEO_TREEBARK,
+
 		GEO_GROUND,
 		GEO_TEXT,
 		NUM_GEOMETRY,
@@ -76,7 +88,7 @@ private:
 	Mesh* meshList[NUM_GEOMETRY];
 	Transform objects[NUM_GEOMETRY];
 	Transform head, body, middle, leftarm, rightarm, nose, lefteye, righteye, hail, object;
-	bool lighton, reverse, hit, complete;
+	bool lighton, reverse, pickup, complete;
 	Light light[1];
 	MS modelStack, viewStack, projectionStack;
 	Camera3 camera;
@@ -92,13 +104,17 @@ private:
 	Color BROWN = Color(.6f, .1f, .2f);
 	Color BLACK = Color(0.f, 0.f, 0.f);
 	Color ORANGE = Color((195 / 255), (82 / 255), (20 / 255));
+	Color GRAY = Color(0.4f, 0.4f, 0.4f);
+
 	void RenderMesh(Mesh* mesh, bool enableLight);
 	void RenderText(Mesh* mesh, std::string text, Color color);
 	void RenderTextOnScreen(Mesh* mesh, std::string text, Color color, float size, float x, float y);
 	void RenderFacingText(Mesh* mesh, std::string text, Color color, float size, float x, float y, float z);
 	void RenderImageOnScreen(Mesh* mesh, float size, float x, float y);
+	void RenderGun();
 	void RenderSkybox();
-	void RenderA01Character();
+	void RenderA01Character(float x, float y, float z, float size, float rotate);
+	void RenderCastle();
 	void Reset();
 public:
 	AssignmentScene2();

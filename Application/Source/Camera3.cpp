@@ -14,15 +14,10 @@ void Camera3::Init(const Vector3& pos, const Vector3& target, const Vector3& up,
 	jumpFrame = 0;
 }
 
-void Camera3::Reset() {
-	this->position = Vector3(1, 0, 1);
-	this->target = Vector3(0, 0, 0);
-	this->up = Vector3(0, 1, 0);
-	this->fov = 45.f;
-}
+void Camera3::Reset() {}
 
 void Camera3::Update(double &dt, Mouse& mouse) {
-	const float SENSITIVITY = 4.f * dt;
+	const float SENSITIVITY = 0.08f;
 	Vector3 view = (target - position).Normalized();
 
 	if (mouse.left) {
@@ -37,7 +32,6 @@ void Camera3::Update(double &dt, Mouse& mouse) {
 		target = position + view;
 	}
 
-	view = (target - position).Normalized();
 	Vector3 right = view.Cross(up).Normalized();
 	right.y = 0;
 
@@ -61,32 +55,75 @@ void Camera3::Update(double &dt, Mouse& mouse) {
 	if (position != target)
 		fov += fov * mouse.scroll * SENSITIVITY;
 
+	float boundary = 35.f;
+
 	if (Application::IsKeyPressed('W')) {
-		position.x += view.x * SENSITIVITY;
-		position.z += view.z * SENSITIVITY;
-		target.x += view.x * SENSITIVITY;
-		target.z += view.z * SENSITIVITY;
+		bool hit = false;
+		if (position.x <= boundary && position.x >= -boundary) {
+			position.x += view.x * SENSITIVITY;
+			target.x += view.x * SENSITIVITY;
+		}
+		if (position.z <= boundary && position.z >= -boundary) {
+			position.z += view.z * SENSITIVITY;
+			target.z += view.z * SENSITIVITY;
+		} 
+		if (position.x < -boundary || position.x > boundary) {
+			position.x = (position.x < -boundary ? -boundary : boundary);
+		}
+		if (position.z < -boundary || position.z > boundary) {
+			position.z = (position.z < -boundary ? -boundary : boundary);
+		}
 	}
 
 	if (Application::IsKeyPressed('S')) {
-		position.x -= view.x * SENSITIVITY;
-		position.z -= view.z * SENSITIVITY;
-		target.x -= view.x * SENSITIVITY;
-		target.z -= view.z * SENSITIVITY;
+		if (position.x <= boundary && position.x >= -boundary) {
+			position.x -= view.x * SENSITIVITY;
+			target.x -= view.x * SENSITIVITY;
+		}
+		if (position.z <= boundary && position.z >= -boundary) {
+			position.z -= view.z * SENSITIVITY;
+			target.z -= view.z * SENSITIVITY;
+		}
+		if (position.x < -boundary || position.x > boundary) {
+			position.x = (position.x < -boundary ? -boundary : boundary);
+		}
+		if (position.z < -boundary || position.z > boundary) {
+			position.z = (position.z < -boundary ? -boundary : boundary);
+		}
 	}
 
 	if (Application::IsKeyPressed('A')) {
-		position.x -= right.x * SENSITIVITY;
-		position.z -= right.z * SENSITIVITY;
-		target.x -= right.x * SENSITIVITY;
-		target.z -= right.z * SENSITIVITY;
+		if (position.x <= boundary && position.x >= -boundary) {
+			position.x -= right.x * SENSITIVITY;
+			target.x -= right.x * SENSITIVITY;
+		}
+		if (position.z <= boundary && position.z >= -boundary) {
+			position.z -= right.z * SENSITIVITY;
+			target.z -= right.z * SENSITIVITY;
+		}
+		if (position.x < -boundary || position.x > boundary) {
+			position.x = (position.x < -boundary ? -boundary : boundary);
+		}
+		if (position.z < -boundary || position.z > boundary) {
+			position.z = (position.z < -boundary ? -boundary : boundary);
+		}
 	}
 
 	if (Application::IsKeyPressed('D')) {
-		position.x += right.x * SENSITIVITY;
-		position.z += right.z * SENSITIVITY;
-		target.x += right.x * SENSITIVITY;
-		target.z += right.z * SENSITIVITY;
+		if (position.x <= boundary && position.x >= -boundary) {
+			position.x += right.x * SENSITIVITY;
+			target.x += right.x * SENSITIVITY;
+		}
+		if (position.z <= boundary && position.z >= -boundary) {
+			position.z += right.z * SENSITIVITY;
+			target.z += right.z * SENSITIVITY;
+		}
+		if (position.x < -boundary || position.x > boundary) {
+			position.x = (position.x < -boundary ? -boundary : boundary);
+		}
+		if (position.z < -boundary || position.z > boundary) {
+			position.z = (position.z < -boundary ? -boundary : boundary);
+		}
 	}
 
 	if (Application::IsKeyPressed(' ')) {
@@ -98,6 +135,8 @@ void Camera3::Update(double &dt, Mouse& mouse) {
 		position.y += SENSITIVITY;
 		target.y += SENSITIVITY;
 		jumpFrame++;
+	} else if (jumpFrame == 0) {
+		return;
 	} else {
 		jumpFrame = 0;
 	}
