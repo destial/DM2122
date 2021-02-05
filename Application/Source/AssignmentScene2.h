@@ -115,6 +115,7 @@ private:
 	void RenderSkybox();
 	void RenderA01Character(float x, float y, float z, float size, float rotate);
 	void RenderCastle();
+	void RenderTree(float x, float y, float z, float size, float rotate);
 	void Reset();
 public:
 	AssignmentScene2();

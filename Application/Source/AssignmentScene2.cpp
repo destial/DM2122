@@ -87,7 +87,10 @@ void AssignmentScene2::Init() {
 
 	meshList[GEO_CASTLEROOF] = MeshBuilder::GenerateCone("roof", GRAY, 30, 2, 1);
 
-	//meshList[GEO_CASTLEWALL] = MeshBuilder::GenerateCube()
+	meshList[GEO_CASTLEWALL] = MeshBuilder::GenerateQuad("wall", GRAY, 10, 2);
+	meshList[GEO_CASTLEWALL]->textureID = LoadTGA("Image//ground.tga");
+
+	meshList[GEO_CASTLEPILLAR] = MeshBuilder::GenerateCylinder("pillar", GRAY, 30, 1, 2);
 
 	meshList[GEO_SUN] = MeshBuilder::GenerateSphere("sun", YELLOW, 30, 30, 5);
 	meshList[GEO_SUN]->textureID = LoadTGA("Image//sun.tga");
@@ -122,6 +125,9 @@ void AssignmentScene2::Init() {
 	meshList[GEO_HOUSE2] = MeshBuilder::GenerateOBJMTL("house", "OBJ//house_type02.obj", "OBJ//house_type02.mtl");
 
 	meshList[GEO_TREE] = MeshBuilder::GenerateOBJMTL("tree", "OBJ//tree_large.obj", "OBJ//tree_large.mtl");
+
+	meshList[GEO_TREETOP] = MeshBuilder::GenerateCone("treetop", GREEN, 30, 1, 2);
+	meshList[GEO_TREEBARK] = MeshBuilder::GenerateCylinder("treebark", BROWN, 30, 0.2f, 3);
 
 	meshList[GEO_GLOCK] = MeshBuilder::GenerateOBJMTL("glock", "OBJ/blasterF.obj", "OBJ/blasterF.mtl");
 
@@ -556,6 +562,24 @@ void AssignmentScene2::RenderA01Character(float x, float y, float z, float size,
 }
 
 void AssignmentScene2::RenderCastle() {
+	modelStack.PushMatrix();
+	RenderMesh(meshList[GEO_CASTLEWALL], true);
+	modelStack.PopMatrix();
+
+}
+
+void AssignmentScene2::RenderTree(float x, float y, float z, float size, float rotate) {
+	modelStack.PushMatrix();
+	modelStack.Translate(x, y+size*2, z);
+	modelStack.Scale(size, size, size);
+	RenderMesh(meshList[GEO_TREETOP], true);
+	modelStack.PopMatrix();
+
+	modelStack.PushMatrix();
+	modelStack.Translate(x, y, z);
+	modelStack.Scale(size, size, size);
+	RenderMesh(meshList[GEO_TREEBARK], true);
+	modelStack.PopMatrix();
 }
 
 void AssignmentScene2::Render() {
@@ -601,32 +625,17 @@ void AssignmentScene2::Render() {
 	RenderMesh(meshList[GEO_HOUSE2], true);
 	modelStack.PopMatrix();
 
-	for (unsigned i = 5; i < 15; ++i) {
-		for (unsigned j = 5; j < 15; ++j) {
-			modelStack.PushMatrix();
-			objects[GEO_TREE].translate.z = i*1.1f;
-			objects[GEO_TREE].translate.x = j*1.1f;
-			objects[GEO_TREE].scale = 2;
-			modelStack.Translate(objects[GEO_TREE].translate.x, objects[GEO_TREE].translate.y, objects[GEO_TREE].translate.z);
-			modelStack.Scale(objects[GEO_TREE].scale, objects[GEO_TREE].scale, objects[GEO_TREE].scale);
-			RenderMesh(meshList[GEO_TREE], true);
-			modelStack.PopMatrix();
-		}
+	objects[GEO_TREE].translate.z = -30;
+	for (int i = -30; i < 30; ++i) {
+		objects[GEO_TREE].translate.x = i * 1.3f;
+		objects[GEO_TREE].translate.z += 0.3f;
+		objects[GEO_TREE].scale = 0.7f;
+		RenderTree(objects[GEO_TREE].translate.x, objects[GEO_TREE].translate.y, objects[GEO_TREE].translate.z, objects[GEO_TREE].scale, 0);
 	}
 
 	for (unsigned i = 5; i < 15; i++) {
-		modelStack.PushMatrix();
-		objects[GEO_TREE].translate.x = 0;
-		objects[GEO_TREE].translate.z = i * 1.5f;
-		objects[GEO_TREE].scale = 2;
-		modelStack.Translate(objects[GEO_TREE].translate.x, objects[GEO_TREE].translate.y, objects[GEO_TREE].translate.z);
-		modelStack.Scale(objects[GEO_TREE].scale, objects[GEO_TREE].scale, objects[GEO_TREE].scale);
-		RenderMesh(meshList[GEO_TREE], true);
-		modelStack.PopMatrix();
-
 		RenderA01Character(i * 1.5f, 0.4f, 0, 0.6f, 90);
 	}
-	//RenderA01Character(0, 0.4f, 0, 0.6f, 0);
 
 	RenderGun();
 }
