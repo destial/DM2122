@@ -87,11 +87,11 @@ Mesh* MeshBuilder::GenerateGround(const std::string& meshName, Color color, floa
 	v.normal.Set(0, 0, 1);
 
 	v.pos.Set(0.5f * lengthX, 0.5f * lengthY, 0.f);
-	v.texCoord.Set(100, 100);
+	v.texCoord.Set(1000, 1000);
 	vertex_buffer_data.push_back(v);
 
 	v.pos.Set(-0.5f * lengthX, 0.5f * lengthY, 0.f);
-	v.texCoord.Set(0, 100);
+	v.texCoord.Set(0, 1000);
 	vertex_buffer_data.push_back(v);
 
 	v.pos.Set(-0.5f * lengthX, -0.5f * lengthY, 0.f);
@@ -99,7 +99,7 @@ Mesh* MeshBuilder::GenerateGround(const std::string& meshName, Color color, floa
 	vertex_buffer_data.push_back(v);
 
 	v.pos.Set(0.5f * lengthX, -0.5f * lengthY, 0.f);
-	v.texCoord.Set(100, 0);
+	v.texCoord.Set(1000, 0);
 	vertex_buffer_data.push_back(v);
 
 	index_buffer_data.push_back(0);
@@ -298,14 +298,14 @@ Mesh* MeshBuilder::GenerateCylinder(const std::string& meshName, Color color, un
 	// bottom circle
 	v.pos.Set(0, -0.5f * height, 0);
 	v.normal.Set(0, -1, 0);
-	v.texCoord.Set(0.5f, 0.5f);
+	//v.texCoord.Set(0.5f, 0.5f);
 	v.color = color;
 	vertex_buffer_data.push_back(v);
 	for (unsigned slice = 0; slice < numSlice + 1; ++slice) {
 		float theta = slice * degree;
 		v.pos.Set(radius * cos(theta), -0.5f * height, radius * sin(theta));
 		v.normal.Set(0, -1, 0);
-		v.texCoord.Set(slice / numSlice, slice / numSlice);
+		//v.texCoord.Set(slice / numSlice, slice / numSlice);
 		vertex_buffer_data.push_back(v);
 		index_buffer_data.push_back(0);
 		index_buffer_data.push_back(slice + 1);
@@ -319,11 +319,12 @@ Mesh* MeshBuilder::GenerateCylinder(const std::string& meshName, Color color, un
 		// bottom
 		v.pos.Set(radius * cos(theta), -0.5f * height, radius * sin(theta));
 		v.normal.Set(cos(theta), 0, sin(theta));
-		v.texCoord.Set(slice / numSlice, slice / numSlice);
+		//v.texCoord.Set(slice / numSlice, slice / numSlice);
 		vertex_buffer_data.push_back(v);
 
 		// top
 		v.pos.Set(radius * cos(theta), 0.5f * height, radius * sin(theta));
+		//v.texCoord.Set(slice / numSlice, slice / numSlice);
 		v.normal.Set(cos(theta), 0, sin(theta));
 		vertex_buffer_data.push_back(v);
 		index_buffer_data.push_back(cylinderStartIndex + 2 * slice + 0);
@@ -334,7 +335,7 @@ Mesh* MeshBuilder::GenerateCylinder(const std::string& meshName, Color color, un
 	unsigned circleStartIndex = vertex_buffer_data.size();
 	v.pos.Set(0, 0.5f * height, 0);
 	v.normal.Set(0, 1, 0);
-	v.texCoord.Set(0.5f, 0.5f);
+	//v.texCoord.Set(0.5f, 0.5f);
 	vertex_buffer_data.push_back(v);
 	for (unsigned slice = 0; slice < numSlice + 1; ++slice) {
 		float theta = slice * degree;
@@ -368,14 +369,14 @@ Mesh* MeshBuilder::GenerateCone(const std::string& meshName, Color color, unsign
 	unsigned circleStartIndex = vertex_buffer_data.size();
 	v.pos.Set(0, -0.5f * height, 0);
 	v.normal.Set(0, -1, 0);
-	v.texCoord.Set(0.5f, 0.5f);
+	//v.texCoord.Set(0.5f, 0.5f);
 	vertex_buffer_data.push_back(v);
 
 	for (unsigned slice = 0; slice < numSlice + 1; ++slice) {
 		float theta = slice * degree;
 		v.pos.Set(radius * cos(Math::DegreeToRadian(theta)), -0.5f * height, radius * sin(Math::DegreeToRadian(theta)));
 		v.normal.Set(0, -1, 0);
-		v.texCoord.Set(slice / numSlice, slice / numSlice);
+		//v.texCoord.Set(slice / numSlice, slice / numSlice);
 		v.color = color;
 		vertex_buffer_data.push_back(v);
 	}
@@ -391,12 +392,12 @@ Mesh* MeshBuilder::GenerateCone(const std::string& meshName, Color color, unsign
 		v.pos.Set(radius * cos(Math::DegreeToRadian(theta)), -0.5f * height, radius * sin(Math::DegreeToRadian(theta)));
 		v.normal.Set(height * cos(Math::DegreeToRadian(theta)), radius, height * sin(Math::DegreeToRadian(theta)));
 		v.normal.Normalize();
-		v.texCoord.Set(slice / numSlice, slice / numSlice);
+		//v.texCoord.Set(slice / numSlice, slice / numSlice);
 		v.color = color;
 		vertex_buffer_data.push_back(v);
 
 		v.pos.Set(0, 0.5f * height, 0);
-		v.texCoord.Set(0.5f, 0.5f);
+		//v.texCoord.Set(0.5f, 0.5f);
 		v.normal.Set(height * cos(Math::DegreeToRadian(theta)), radius, height * sin(Math::DegreeToRadian(theta)));
 		v.normal.Normalize();
 		v.color = color;
