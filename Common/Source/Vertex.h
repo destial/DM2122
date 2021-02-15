@@ -31,15 +31,24 @@ struct Transform {
 	float rotate;
 	Vector3 translate;
 	float scale;
-	Transform(float r = 0, float tX = 0, float tY = 0, float tZ = 0, float s = 1) {
-		Set(r, tX, tY, tZ, s);
+	Vector3 aScale;
+	Transform(float r = 0, float tX = 0, float tY = 0, float tZ = 0, float s = 1, float sX = 1, float sY = 1, float sZ = 1) {
+		Set(r, tX, tY, tZ, s, sX, sY, sZ);
 	}
-	void Set(float r, float tX, float tY, float tZ, float s) {
+	void Set(float r, float tX, float tY, float tZ, float s, float sX, float sY, float sZ) {
 		this->rotate = r;
 		this->translate.x = tX;
 		this->translate.y = tY;
 		this->translate.z = tZ;
 		this->scale = s;
+		this->aScale.x = sX;
+		this->aScale.y = sY;
+		this->aScale.z = sZ;
+		if (scale != 1) {
+			this->aScale.x = scale;
+			this->aScale.y = scale;
+			this->aScale.z = scale;
+		}
 	}
 	void Set(Transform& t) {
 		this->rotate = t.rotate;
@@ -47,6 +56,12 @@ struct Transform {
 		this->translate.y = t.translate.y;
 		this->translate.z = t.translate.z;
 		this->scale = t.scale;
+		this->aScale = t.aScale;
+		if (t.scale != 1) {
+			this->aScale.x = t.scale;
+			this->aScale.y = t.scale;
+			this->aScale.z = t.scale;
+		}
 	}
 };
 

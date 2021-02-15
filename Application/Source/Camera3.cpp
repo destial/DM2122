@@ -32,6 +32,7 @@ void Camera3::Update(double &dt, Mouse& mouse) {
 		target = position + view;
 	}
 
+	view = (target - position).Normalized();
 	Vector3 right = view.Cross(up).Normalized();
 	right.y = 0;
 
@@ -48,9 +49,13 @@ void Camera3::Update(double &dt, Mouse& mouse) {
 	}
 
 	view = (target - position).Normalized();
+	right.y = 0;
 	up = right.Cross(view).Normalized();
-	if (up.y < 0.5f) {
-		up.y = 0.5f;
+	if (up.y < 0.f) {
+		target.y += 0.1f;
+		view = (target - position).Normalized();
+		right.y = 0;
+		up = right.Cross(view).Normalized();
 	}
 	if (position != target)
 		fov += fov * mouse.scroll * SENSITIVITY;

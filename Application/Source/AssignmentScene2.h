@@ -13,6 +13,7 @@
 #include "GL\glew.h"
 #include "shader.hpp"
 #include "Application.h"
+#include "Coin.h"
 #include <cmath>
 
 class AssignmentScene2 : public Scene {
@@ -22,10 +23,13 @@ class AssignmentScene2 : public Scene {
 		GEO_CONE,
 		GEO_SUN,
 		GEO_CYL,
+		GEO_LAMP,
 
 		GEO_CASTLEROOF,
 		GEO_CASTLEWALL,
 		GEO_CASTLEPILLAR,
+
+		GEO_COIN,
 
 		GEO_GLOCK,
 
@@ -45,6 +49,10 @@ class AssignmentScene2 : public Scene {
 
 		GEO_GROUND,
 		GEO_TEXT,
+
+		CHARACTER_POS,
+		CHARACTER_TAR,
+		CHARACTER_UP,
 		NUM_GEOMETRY,
 	};
 	enum UNIFORM_TYPE {
@@ -69,6 +77,58 @@ class AssignmentScene2 : public Scene {
 		U_LIGHT0_COSINNER,
 		U_LIGHT0_EXPONENT,
 
+		U_LIGHT1_POSITION,
+		U_LIGHT1_COLOR,
+		U_LIGHT1_POWER,
+		U_LIGHT1_KC,
+		U_LIGHT1_KL,
+		U_LIGHT1_KQ,
+
+		U_LIGHT1_TYPE,
+		U_LIGHT1_SPOTDIRECTION,
+		U_LIGHT1_COSCUTOFF,
+		U_LIGHT1_COSINNER,
+		U_LIGHT1_EXPONENT,
+
+		U_LIGHT2_POSITION,
+		U_LIGHT2_COLOR,
+		U_LIGHT2_POWER,
+		U_LIGHT2_KC,
+		U_LIGHT2_KL,
+		U_LIGHT2_KQ,
+
+		U_LIGHT2_TYPE,
+		U_LIGHT2_SPOTDIRECTION,
+		U_LIGHT2_COSCUTOFF,
+		U_LIGHT2_COSINNER,
+		U_LIGHT2_EXPONENT,
+
+		U_LIGHT3_POSITION,
+		U_LIGHT3_COLOR,
+		U_LIGHT3_POWER,
+		U_LIGHT3_KC,
+		U_LIGHT3_KL,
+		U_LIGHT3_KQ,
+
+		U_LIGHT3_TYPE,
+		U_LIGHT3_SPOTDIRECTION,
+		U_LIGHT3_COSCUTOFF,
+		U_LIGHT3_COSINNER,
+		U_LIGHT3_EXPONENT,
+
+		U_LIGHT4_POSITION,
+		U_LIGHT4_COLOR,
+		U_LIGHT4_POWER,
+		U_LIGHT4_KC,
+		U_LIGHT4_KL,
+		U_LIGHT4_KQ,
+
+		U_LIGHT4_TYPE,
+		U_LIGHT4_SPOTDIRECTION,
+		U_LIGHT4_COSCUTOFF,
+		U_LIGHT4_COSINNER,
+		U_LIGHT4_EXPONENT,
+
 		U_NUMLIGHTS,
 		U_COLOR_TEXTURE_ENABLED,
 		U_COLOR_TEXTURE,
@@ -77,6 +137,10 @@ class AssignmentScene2 : public Scene {
 		U_TEXT_ENABLED,
 		U_TEXT_COLOR,
 		U_TOTAL,
+	};
+	enum CAMERA_STATE {
+		FIRST_PERSON,
+		THIRD_PERSON,
 	};
 private:
 	unsigned m_vertexArrayID;
@@ -87,12 +151,16 @@ private:
 	unsigned m_parameters[U_TOTAL];
 	Mesh* meshList[NUM_GEOMETRY];
 	Transform objects[NUM_GEOMETRY];
-	Transform head, body, middle, leftarm, rightarm, nose, lefteye, righteye, hail, object;
+	Coin coins[5];
+	std::vector<Transform*> gameObjects;
+	Transform head, body, middle, leftarm, rightarm, nose, lefteye, righteye, hail, object, coin;
 	bool lighton, reverse, pickup, complete;
-	Light light[1];
+	unsigned cameraState;
+	Light light[5];
 	MS modelStack, viewStack, projectionStack;
 	Camera3 camera;
 	float bounds;
+	int money;
 
 	Color RED = Color(1.f, 0.f, 0.f);
 	Color GREEN = Color(0.f, 1.f, 0.f);
@@ -113,10 +181,16 @@ private:
 	void RenderImageOnScreen(Mesh* mesh, float size, float x, float y);
 	void RenderGun();
 	void RenderSkybox();
-	void RenderA01Character(float x, float y, float z, float size, float rotate);
+	void RenderA01Character(float x, float y, float z, float size, float rotate, bool animate);
 	void RenderCastle();
 	void RenderTree(float x, float y, float z, float size, float rotate);
 	void Reset();
+	void RenderDialogue(std::string dialogue);
+	void RenderDialogue(std::string dialogue, float x, float y);
+	void RenderCoins();
+	void Collision();
+	void addObject(Transform* object);
+	bool isHit(Transform* object);
 public:
 	AssignmentScene2();
 	~AssignmentScene2();
