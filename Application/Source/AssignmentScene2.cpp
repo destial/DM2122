@@ -235,7 +235,10 @@ void AssignmentScene2::Init() {
 	meshList[GEO_TREETOP] = MeshBuilder::GenerateCone("treetop", GREEN, 30, 1, 2);
 	meshList[GEO_TREEBARK] = MeshBuilder::GenerateCylinder("treebark", BROWN, 30, 0.2f, 3);
 
-	meshList[GEO_GLOCK] = MeshBuilder::GenerateOBJMTL("glock", "OBJ//blasterF.obj", "OBJ//blasterF.mtl");
+	meshList[GEO_GLOCK] = MeshBuilder::GenerateOBJ("glock", "OBJ//blasterF.obj");
+	meshList[GEO_GLOCK]->textureID = LoadTGA("Image//carbonfiber.tga");
+
+	meshList[GEO_BULLET] = MeshBuilder::GenerateSphere("bullet", BLACK, 30, 30, 1.f);
 
 	bounds = 300.f;
 
@@ -334,10 +337,44 @@ void AssignmentScene2::Update(double dt, Mouse mouse) {
 	std::string fpsString = std::to_string(fps).substr(0, std::to_string(fps).find('.') + 4);
 	RenderTextOnScreen(meshList[GEO_TEXT], ("FPS:" + fpsString), GREEN, 4, 0, 14);
 	std::string moneyString = std::to_string(money);
-	RenderTextOnScreen(meshList[GEO_TEXT], ("Money:" + moneyString), YELLOW, 4, 14, 14);
+	RenderTextOnScreen(meshList[GEO_TEXT], ("Coins:" + moneyString), YELLOW, 4, 14, 14);
 	Collision();
+	if (pickup) {
+		Vector3 origin = Vector3(-1, 0, 0);
+		Vector3 lookAt = (camera.target - camera.position).Normalized();
+		lookAt.y = 0;
+		float uv = (origin.x * lookAt.x + origin.z * lookAt.z) / ((sqrT(origin.x * origin.x + origin.z * origin.z)) * sqrT(lookAt.x * lookAt.x + lookAt.z * lookAt.z));
+		float angle = Math::RadianToDegree(acos(uv));
+		if (lookAt.z <= 0 && lookAt.x <= 0) {
+			angle = 360 - angle;
+		} else if (lookAt.x >= 0 && lookAt.z <= 0) {
+			angle = 360 - angle;
+		}
+		objects[GEO_GLOCK].translate = camera.target;
+		objects[GEO_GLOCK].translate.y -= 0.4f;
+		objects[GEO_GLOCK].rotate = angle + 90;
+		if (Application::IsMousePressedOnce(0)) {
+			Vector3 view = (camera.target - camera.position).Normalized();
+			view.y = 0;
+			view.Normalize();
+			Bullet* bullet = new Bullet(meshList[GEO_BULLET], view);
+			bullets.push_back(bullet);
+			bullet->transform->translate.x = objects[GEO_GLOCK].translate.x;
+			bullet->transform->translate.y = objects[GEO_GLOCK].translate.y;
+			bullet->transform->translate.z = objects[GEO_GLOCK].translate.z;
+			bullet->transform->scale = 0.1f;
+			bullet->target = view;
+		}
+		for (auto b : bullets) {
+			if (b) {
+				b->move();
+			}
+		}
+	}
 	for (auto go : gameObjects) {
-		delete go;
+		if (go) {
+			delete go;
+		}
 	}
 	gameObjects.clear();
 }
@@ -492,17 +529,9 @@ void AssignmentScene2::RenderImageOnScreen(Mesh* mesh, float size, float x, floa
 }
 
 void AssignmentScene2::RenderGun() {
-	Vector3 origin = Vector3(0, 0, 1);
-	Vector3 lookAt = (camera.position - camera.target).Normalized();
-	Vector3 cameraRight = lookAt.Cross(camera.up).Normalized();
-	double uv = (cameraRight.x * lookAt.x + cameraRight.z * lookAt.z) / ((sqrT(cameraRight.x * cameraRight.x + cameraRight.z * cameraRight.z)) * sqrT(lookAt.x * lookAt.x + lookAt.z * lookAt.z));
-	double angle = Math::RadianToDegree(acos(uv));
-	if (angle >= 180)
-		angle = 360 - angle;
-	objects[GEO_GLOCK].translate = camera.target;
 	modelStack.PushMatrix();
-	modelStack.Translate(objects[GEO_GLOCK].translate.x, objects[GEO_GLOCK].translate.y-0.4, objects[GEO_GLOCK].translate.z);
-	modelStack.Rotate(angle, 0, 1, 0);
+	modelStack.Translate(objects[GEO_GLOCK].translate.x, objects[GEO_GLOCK].translate.y, objects[GEO_GLOCK].translate.z);
+	modelStack.Rotate(objects[GEO_GLOCK].rotate, 0, 1, 0);
 	RenderMesh(meshList[GEO_GLOCK], false);
 	modelStack.PopMatrix();
 }
@@ -961,13 +990,57 @@ void AssignmentScene2::Render() {
 		modelStack.PopMatrix();
 	}
 	RenderCoins();
-	//RenderGun();
+	if (complete) {
+		if (!pickup) {
+			if (camera.position.x <= 2 &&
+				camera.position.x >= -2 &&
+				camera.position.z <= 8 &&
+				camera.position.z >= 5) {
+				pickup = true;
+			}
+		}
+		RenderGun();
+		RenderBullets();
+	}
+	RenderA01Character(0, 0.4f, 5, 0.6f, 0, false);
+	if (camera.position.x <= 3 &&
+		camera.position.x >= -3 &&
+		camera.position.z <= 8 &&
+		camera.position.z >= 2) {
+		if (money != 5) {
+			RenderDialogue("Find all 5 of my coins!");
+		} else {
+			if (!complete) {
+				RenderDialogue("Thank you! Here!");
+				spawnGun();
+			} else {
+				RenderDialogue("Thank you!");
+			}
+		}
+	}
+}
+
+void AssignmentScene2::spawnGun() {
+	objects[GEO_GLOCK].translate.x = 0;
+	objects[GEO_GLOCK].translate.y = 0.8f;
+	objects[GEO_GLOCK].translate.z = 7;
+	complete = true;
 }
 
 void AssignmentScene2::Exit() {
 	for (unsigned i = 0; i < NUM_GEOMETRY; i++) {
 		if (meshList[i]) delete meshList[i];
 	}
+	for (auto o : gameObjects) {
+		if (o) delete o;
+	}
+	gameObjects.clear();
+	for (auto bullet : bullets) {
+		if (bullet) {
+			delete bullet;
+		}
+	}
+	bullets.clear();
 	glDeleteProgram(m_programID);
 }
 
@@ -1041,6 +1114,18 @@ void AssignmentScene2::RenderCoins() {
 	money = m;
 }
 
+void AssignmentScene2::RenderBullets() {
+	for (auto bullet : bullets) {
+		if (bullet) {
+			modelStack.PushMatrix();
+			modelStack.Translate(bullet->transform->translate.x, bullet->transform->translate.y, bullet->transform->translate.z);
+			modelStack.Scale(bullet->transform->scale, bullet->transform->scale, bullet->transform->scale);
+			RenderMesh(bullet->mesh, false);
+			modelStack.PopMatrix();
+		}
+	}
+}
+
 void AssignmentScene2::Collision() {
 	for (std::vector<Transform*>::iterator iterator = gameObjects.begin(); iterator != gameObjects.end(); ++iterator) {
 		Transform* object = *iterator;
@@ -1056,7 +1141,6 @@ void AssignmentScene2::Collision() {
 			camera.position.z <= coins[i].position.z + 1 &&
 			camera.position.z >= coins[i].position.z) {
 			coins[i].collected = true;
-			//money++;
 		}
 	}
 }

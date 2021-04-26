@@ -16,6 +16,28 @@
 #include "Coin.h"
 #include <cmath>
 
+struct Bullet {
+	Bullet(Mesh* mesh, Transform& transform, Vector3 target) {
+		this->mesh = mesh;
+		this->transform = new Transform(transform);
+		this->target = target;
+	}
+	Bullet(Mesh* mesh, Vector3 target) {
+		this->mesh = mesh;
+		this->transform = new Transform();
+		this->target = target;
+	}
+	~Bullet() {
+		delete transform;
+	}
+	void move() {
+		this->transform->translate += (2)*(this->target);
+	}
+	Mesh* mesh;
+	Transform* transform;
+	Vector3 target;
+};
+
 class AssignmentScene2 : public Scene {
 	enum GEOMETRY_TYPE {
 		GEO_SPHERE,
@@ -32,6 +54,7 @@ class AssignmentScene2 : public Scene {
 		GEO_COIN,
 
 		GEO_GLOCK,
+		GEO_BULLET,
 
 		GEO_LEFT,
 		GEO_RIGHT,
@@ -153,6 +176,7 @@ private:
 	Transform objects[NUM_GEOMETRY];
 	Coin coins[5];
 	std::vector<Transform*> gameObjects;
+	std::vector<Bullet*> bullets;
 	Transform head, body, middle, leftarm, rightarm, nose, lefteye, righteye, hail, object, coin;
 	bool lighton, reverse, pickup, complete;
 	unsigned cameraState;
@@ -188,9 +212,11 @@ private:
 	void RenderDialogue(std::string dialogue);
 	void RenderDialogue(std::string dialogue, float x, float y);
 	void RenderCoins();
+	void RenderBullets();
 	void Collision();
 	void addObject(Transform* object);
 	bool isHit(Transform* object);
+	void spawnGun();
 public:
 	AssignmentScene2();
 	~AssignmentScene2();
